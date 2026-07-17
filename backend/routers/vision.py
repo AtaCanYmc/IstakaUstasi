@@ -9,7 +9,7 @@ from okey_server.dependencies import get_roboflow_workflow_provider, validate_im
 
 from dependencies.auth import get_current_user
 from models.vision import ExtractResultCustom
-from services.supabase_service import SupabaseService
+from services.user_service import UserService
 
 logger = structlog.get_logger("okey_bridge_server.routers.vision")
 router = APIRouter(prefix="/vision", tags=["Vision"])
@@ -26,7 +26,7 @@ async def extract_vision(
     Requires user auth and decrements extraction quota.
     """
     # Check/Decrement quota
-    if not await SupabaseService.check_and_update_quota(current_user["id"]):
+    if not await UserService.check_and_update_quota(current_user["id"]):
         raise HTTPException(
             status_code=402,
             detail="Quota exceeded. Weekly quota limits you to 5 image extractions.",
@@ -58,7 +58,7 @@ async def solve_vision(
     Requires user auth and decrements extraction quota.
     """
     # Check/Decrement quota
-    if not await SupabaseService.check_and_update_quota(current_user["id"]):
+    if not await UserService.check_and_update_quota(current_user["id"]):
         raise HTTPException(
             status_code=402,
             detail="Quota exceeded. Weekly quota limits you to 5 image extractions.",

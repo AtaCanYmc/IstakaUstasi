@@ -5,10 +5,10 @@ import structlog
 
 from db import DatabaseFactory
 
-logger = structlog.get_logger("okey_bridge_server.services.supabase")
+logger = structlog.get_logger("okey_bridge_server.services.user")
 
 
-class SupabaseService:
+class UserService:
     @classmethod
     async def sync_user_profile(
         cls, user_id: str, email: str, username: Optional[str] = None

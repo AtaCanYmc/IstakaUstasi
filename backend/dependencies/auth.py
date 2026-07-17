@@ -2,7 +2,7 @@ import structlog
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from services.supabase_service import SupabaseService
+from db import DatabaseFactory
 
 logger = structlog.get_logger("okey_bridge_server.dependencies.auth")
 security = HTTPBearer()
@@ -13,7 +13,12 @@ async def get_current_user(
 ) -> dict:
     token = credentials.credentials
     try:
-        client = SupabaseService.get_client()
+        provider = DatabaseFactory.get_provider()
+        # Retrieve initialized Supabase client from provider
+        client = getattr(provider, "client", None)
+        if not client:
+            raise ValueError("Active database provider does not supply a client.")
+
         auth_res = client.auth.get_user(token)
         if not auth_res or not auth_res.user:
             raise HTTPException(
