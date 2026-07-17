@@ -1,13 +1,15 @@
-from fastapi import APIRouter, HTTPException
 import structlog
+from fastapi import APIRouter, HTTPException
 
 # Import okey types and functions
 from okey_core.types import Arrangement
 from okey_solver import create_standard_okey_solver
+
 from models.solver import ArrangeRequestCustom
 
 logger = structlog.get_logger("okey_bridge_server.routers.solver")
 router = APIRouter(prefix="/solver", tags=["Solver"])
+
 
 @router.post("/arrange", response_model=Arrangement)
 def arrange_hand(req: ArrangeRequestCustom):
@@ -17,14 +19,17 @@ def arrange_hand(req: ArrangeRequestCustom):
     """
     strategy = req.strategy or "backtracking"
     strategy = strategy.lower()
-    
+
     valid_strategies = ["backtracking", "greedy", "ilp", "hybrid"]
     if strategy not in valid_strategies:
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid strategy '{strategy}'. Supported strategies: {', '.join(valid_strategies)}"
+            detail=(
+                f"Invalid strategy '{strategy}'. "
+                f"Supported strategies: {', '.join(valid_strategies)}"
+            ),
         )
-        
+
     try:
         logger.info("Solving hand", tiles_count=len(req.tiles), strategy=strategy)
         solver = create_standard_okey_solver(strategy=strategy)

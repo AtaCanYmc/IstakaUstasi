@@ -1,6 +1,8 @@
-from typing import List, Optional, Any
-from pydantic import BaseModel
+from typing import Any, List, Optional
+
 from okey_core.types import Tile
+from pydantic import BaseModel
+
 
 class ExtractResultCustom(BaseModel):
     tiles: List[Tile]

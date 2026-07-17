@@ -1,14 +1,17 @@
-from typing import Optional, Any
-from fastapi import APIRouter, Depends, Form, HTTPException
+from typing import Any, Optional
+
 import structlog
+from fastapi import APIRouter, Depends, Form, HTTPException
 
 # Import okey types and functions
-from okey_core.types import OkeyMeta, TileColor, OrchestratorResult
-from okey_server.dependencies import validate_image_file, get_roboflow_workflow_provider
+from okey_core.types import OkeyMeta, OrchestratorResult, TileColor
+from okey_server.dependencies import get_roboflow_workflow_provider, validate_image_file
+
 from models.vision import ExtractResultCustom
 
 logger = structlog.get_logger("okey_bridge_server.routers.vision")
 router = APIRouter(prefix="/vision", tags=["Vision"])
+
 
 @router.post("/extract", response_model=ExtractResultCustom)
 async def extract_vision(
@@ -16,10 +19,10 @@ async def extract_vision(
     pipeline: Any = Depends(get_roboflow_workflow_provider),
 ):
     """
-    Detects and extracts the list of Okey tiles from an uploaded image using Roboflow workflows.
+    Detects and extracts Okey tiles from an image using Roboflow.
     """
     from okey_vision import VisionEngine
-    
+
     try:
         logger.info("Extracting tiles from image")
         vision_engine = VisionEngine(pipeline=pipeline)
@@ -28,9 +31,8 @@ async def extract_vision(
         return ExtractResultCustom(tiles=tiles, raw=raw_val)
     except Exception as e:
         logger.exception("Vision processing error occurred", error=str(e))
-        raise HTTPException(
-            status_code=500, detail=f"Vision provider error: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Vision provider error: {str(e)}")
+
 
 @router.post("/solve", response_model=OrchestratorResult)
 async def solve_vision(

@@ -1,13 +1,12 @@
-import os
+import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import structlog
+from okey_server.logging_config import setup_logging
+from okey_server.otel_config import setup_opentelemetry
+from okey_server.registry import VisionProviderRegistry
 
 # Import state configs and configurations
 from okey_server.settings import OkeyServerSettings
-from okey_server.registry import VisionProviderRegistry
-from okey_server.logging_config import setup_logging
-from okey_server.otel_config import setup_opentelemetry
 
 # Import router modules
 from routers.solver import router as solver_router
@@ -20,7 +19,10 @@ logger = structlog.get_logger("okey_bridge_server")
 # Initialize FastAPI App
 app = FastAPI(
     title="Okey Solver Bridge API",
-    description="Bridge microservice for solving Okey hand arrangements and detecting tiles from images.",
+    description=(
+        "Bridge microservice for solving Okey hand arrangements "
+        "and detecting tiles from images."
+    ),
     version="0.5.0",
 )
 
@@ -46,13 +48,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/api/v1/health")
 def health_check():
     return {
         "status": "ok",
         "version": "0.5.0",
-        "vision_configured": settings.rf_key is not None
+        "vision_configured": settings.rf_key is not None,
     }
+
 
 # Include routers under /api/v1 prefix
 app.include_router(solver_router, prefix="/api/v1")
