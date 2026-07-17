@@ -25,6 +25,7 @@ class SupabaseUserRepository(IUserRepository):
             email=data["email"],
             username=data.get("username"),
             image_quota_count=data["image_quota_count"],
+            solver_quota_count=data.get("solver_quota_count", 20),
             last_reset_date=data["last_reset_date"],
             created_at=data["created_at"],
             updated_at=data["updated_at"],
@@ -42,6 +43,7 @@ class SupabaseUserRepository(IUserRepository):
         email: str,
         username: Optional[str] = None,
         initial_quota: int = 5,
+        initial_solver_quota: int = 20,
     ) -> UserProfile:
         from datetime import datetime, timezone
 
@@ -51,6 +53,7 @@ class SupabaseUserRepository(IUserRepository):
             "email": email,
             "username": username or email.split("@")[0],
             "image_quota_count": initial_quota,
+            "solver_quota_count": initial_solver_quota,
             "last_reset_date": now_str,
             "created_at": now_str,
             "updated_at": now_str,

@@ -15,7 +15,7 @@ class UserService:
     ) -> Dict[str, Any]:
         """
         Synchronizes user profile after authenticating.
-        Creates record if it does not exist, initializing quota to 5.
+        Creates record if it does not exist, initializing quotas to defaults.
         """
         provider = DatabaseFactory.get_provider()
         user_repo = provider.get_user_repository()
@@ -23,7 +23,11 @@ class UserService:
             user = await user_repo.get_user(user_id)
             if not user:
                 user = await user_repo.create_user(
-                    user_id, email, username=username, initial_quota=5
+                    user_id,
+                    email,
+                    username=username,
+                    initial_quota=5,
+                    initial_solver_quota=20,
                 )
                 logger.info(
                     "Created new user profile in database",
@@ -76,6 +80,7 @@ class UserService:
                     user_id,
                     {
                         "image_quota_count": quota,
+                        "solver_quota_count": 20,
                         "last_reset_date": now.isoformat(),
                     },
                 )
