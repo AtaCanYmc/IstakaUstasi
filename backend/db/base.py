@@ -39,7 +39,7 @@ class IUserRepository(ABC):
         email: str,
         username: Optional[str] = None,
         initial_quota: int = 5,
-        initial_solver_quota: int = 20,
+        initial_solver_quota: int = 100,
     ) -> UserProfile:
         """Create new user profile"""
         pass
