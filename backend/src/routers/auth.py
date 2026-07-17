@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
-from dependencies.auth import get_current_user
-from services.user_service import UserService
+from src.dependencies.auth import get_current_user
+from src.services.user_service import UserService
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 

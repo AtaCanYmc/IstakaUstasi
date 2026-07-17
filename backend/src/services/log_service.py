@@ -1,7 +1,7 @@
 import logging
 from typing import Any, Dict, Optional
 
-from db import DatabaseFactory, ISystemLogRepository, SystemLogCreate
+from src.db import DatabaseFactory, ISystemLogRepository, SystemLogCreate
 
 logger = logging.getLogger("okey_bridge_server")
 

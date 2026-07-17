@@ -4,8 +4,8 @@ import traceback
 from fastapi import Request
 from fastapi.responses import JSONResponse
 
-from core.exceptions import DomainException
-from services.log_service import LogService, RepositoryFactory
+from src.core.exceptions import DomainException
+from src.services.log_service import LogService, RepositoryFactory
 
 
 async def domain_exception_handler(request: Request, exc: DomainException):

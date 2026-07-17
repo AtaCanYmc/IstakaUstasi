@@ -8,10 +8,11 @@ from okey_server.registry import VisionProviderRegistry
 # Import state configs and configurations
 from okey_server.settings import OkeyServerSettings
 
+from src.routers import router as vision_router
+
 # Import router modules
-from routers.auth import router as auth_router
-from routers.solver import router as solver_router
-from routers.vision import router as vision_router
+from src.routers.auth import router as auth_router
+from src.routers.solver import router as solver_router
 
 # Setup logging
 setup_logging()

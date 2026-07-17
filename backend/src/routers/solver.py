@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException
 from okey_core.types import Arrangement
 from okey_solver import create_standard_okey_solver
 
-from models.solver import ArrangeRequestCustom
+from src.models.solver import ArrangeRequestCustom
 
 logger = structlog.get_logger("okey_bridge_server.routers.solver")
 router = APIRouter(prefix="/solver", tags=["Solver"])
