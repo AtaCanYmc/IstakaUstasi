@@ -10,9 +10,11 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 async def sync_user(current_user: dict = Depends(get_current_user)):
     """
     Syncs authenticated Supabase auth.users into public.users table.
-    Initializes quota if the user record does not exist.
+    Initializes quota and user metadata if the user record does not exist.
     """
-    profile = SupabaseService.sync_user_profile(
-        user_id=current_user["id"], email=current_user["email"]
+    profile = await SupabaseService.sync_user_profile(
+        user_id=current_user["id"],
+        email=current_user["email"],
+        username=current_user.get("username"),
     )
     return {"message": "User synchronized successfully", "profile": profile}

@@ -22,7 +22,13 @@ async def get_current_user(
             )
 
         user = auth_res.user
-        return {"id": user.id, "email": user.email}
+        metadata = getattr(user, "user_metadata", {}) or {}
+        username = (
+            metadata.get("full_name")
+            or metadata.get("name")
+            or metadata.get("user_name")
+        )
+        return {"id": user.id, "email": user.email, "username": username}
     except Exception as e:
         logger.warning("Authentication failed", error=str(e))
         raise HTTPException(

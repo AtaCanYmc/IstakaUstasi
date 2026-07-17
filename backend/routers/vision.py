@@ -26,7 +26,7 @@ async def extract_vision(
     Requires user auth and decrements extraction quota.
     """
     # Check/Decrement quota
-    if not SupabaseService.check_and_update_quota(current_user["id"]):
+    if not await SupabaseService.check_and_update_quota(current_user["id"]):
         raise HTTPException(
             status_code=402,
             detail="Quota exceeded. Weekly quota limits you to 5 image extractions.",
@@ -58,7 +58,7 @@ async def solve_vision(
     Requires user auth and decrements extraction quota.
     """
     # Check/Decrement quota
-    if not SupabaseService.check_and_update_quota(current_user["id"]):
+    if not await SupabaseService.check_and_update_quota(current_user["id"]):
         raise HTTPException(
             status_code=402,
             detail="Quota exceeded. Weekly quota limits you to 5 image extractions.",

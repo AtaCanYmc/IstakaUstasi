@@ -1,38 +1,15 @@
 import logging
 from typing import Any, Dict, Optional
 
-from pydantic import BaseModel
+from db import DatabaseFactory, ISystemLogRepository, SystemLogCreate
 
 logger = logging.getLogger("okey_bridge_server")
-
-
-class SystemLogCreate(BaseModel):
-    level: str
-    module: str
-    message: str
-    user_id: Optional[str] = None
-    request_id: Optional[str] = None
-    ip_address: Optional[str] = None
-    endpoint: Optional[str] = None
-    details: Optional[Dict[str, Any]] = None
-
-
-class ISystemLogRepository:
-    async def create_log(self, log_entry: SystemLogCreate) -> None:
-        """Abstract method to create a log in database/pool"""
-        pass
-
-
-class ConsoleSystemLogRepository(ISystemLogRepository):
-    async def create_log(self, log_entry: SystemLogCreate) -> None:
-        # Simply logs to console/structured logger as a fallback db log
-        logger.info("Database Log Pool Entry Created")
 
 
 class RepositoryFactory:
     @staticmethod
     def get_system_log_repository() -> ISystemLogRepository:
-        return ConsoleSystemLogRepository()
+        return DatabaseFactory.get_provider().get_system_log_repository()
 
 
 class LogService:
