@@ -1,0 +1,17 @@
+.git
+.github
+.idea
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.env
+.env.example
+.pytest_cache
+.coverage
+htmlcov
+Dockerfile
+docker-compose.yml
+.pre-commit-config.yaml
+.flake8
