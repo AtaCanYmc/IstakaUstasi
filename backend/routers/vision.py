@@ -1,18 +1,14 @@
-from typing import List, Optional, Any
+from typing import Optional, Any
 from fastapi import APIRouter, Depends, Form, HTTPException
 import structlog
 
 # Import okey types and functions
-from okey_core.types import Tile, OkeyMeta, TileColor, OrchestratorResult
+from okey_core.types import OkeyMeta, TileColor, OrchestratorResult
 from okey_server.dependencies import validate_image_file, get_roboflow_workflow_provider
-from pydantic import BaseModel
+from models.vision import ExtractResultCustom
 
 logger = structlog.get_logger("okey_bridge_server.routers.vision")
 router = APIRouter(prefix="/vision", tags=["Vision"])
-
-class ExtractResultCustom(BaseModel):
-    tiles: List[Tile]
-    raw: Optional[Any] = None
 
 @router.post("/extract", response_model=ExtractResultCustom)
 async def extract_vision(

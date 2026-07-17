@@ -1,20 +1,13 @@
-from typing import List, Optional
 from fastapi import APIRouter, HTTPException
 import structlog
 
 # Import okey types and functions
-from okey_core.types import Tile, Arrangement, OkeyMeta
+from okey_core.types import Arrangement
 from okey_solver import create_standard_okey_solver
-from pydantic import BaseModel
+from models.solver import ArrangeRequestCustom
 
 logger = structlog.get_logger("okey_bridge_server.routers.solver")
 router = APIRouter(prefix="/solver", tags=["Solver"])
-
-# Define request schema
-class ArrangeRequestCustom(BaseModel):
-    tiles: List[Tile]
-    okey_meta: Optional[OkeyMeta] = None
-    strategy: Optional[str] = "backtracking" # backtracking, greedy, ilp, hybrid
 
 @router.post("/arrange", response_model=Arrangement)
 def arrange_hand(req: ArrangeRequestCustom):
