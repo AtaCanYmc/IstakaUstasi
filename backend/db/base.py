@@ -38,7 +38,7 @@ class IUserRepository(ABC):
         user_id: str,
         email: str,
         username: Optional[str] = None,
-        initial_quota: int = 5,
+        initial_image_quota: int = 5,
         initial_solver_quota: int = 100,
     ) -> UserProfile:
         """Create new user profile"""

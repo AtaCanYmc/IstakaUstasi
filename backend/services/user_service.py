@@ -26,8 +26,8 @@ class UserService:
                     user_id,
                     email,
                     username=username,
-                    initial_quota=5,
-                    initial_solver_quota=20,
+                    initial_image_quota=10,
+                    initial_solver_quota=100,
                 )
                 logger.info(
                     "Created new user profile in database",
