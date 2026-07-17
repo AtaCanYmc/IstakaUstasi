@@ -9,6 +9,7 @@ from okey_server.registry import VisionProviderRegistry
 from okey_server.settings import OkeyServerSettings
 
 # Import router modules
+from routers.auth import router as auth_router
 from routers.solver import router as solver_router
 from routers.vision import router as vision_router
 
@@ -59,5 +60,6 @@ def health_check():
 
 
 # Include routers under /api/v1 prefix
+app.include_router(auth_router, prefix="/api/v1")
 app.include_router(solver_router, prefix="/api/v1")
 app.include_router(vision_router, prefix="/api/v1")

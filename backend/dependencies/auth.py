@@ -1,0 +1,31 @@
+import structlog
+from fastapi import Depends, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+
+from services.supabase_service import SupabaseService
+
+logger = structlog.get_logger("okey_bridge_server.dependencies.auth")
+security = HTTPBearer()
+
+
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+) -> dict:
+    token = credentials.credentials
+    try:
+        client = SupabaseService.get_client()
+        auth_res = client.auth.get_user(token)
+        if not auth_res or not auth_res.user:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid auth credentials or token expired",
+            )
+
+        user = auth_res.user
+        return {"id": user.id, "email": user.email}
+    except Exception as e:
+        logger.warning("Authentication failed", error=str(e))
+        raise HTTPException(
+            status_code=401,
+            detail="Authentication failed or token invalid",
+        )
