@@ -1,0 +1,30 @@
+[project]
+name = "istaka-ustasi-backend"
+version = "0.1.0"
+description = "FastAPI backend for Istaka Ustasi using okey-solver-py"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "okey-solver-py[vision,server]==0.5.0",
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py311']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | \.env
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
+skip = [".venv", ".git", ".env"]
