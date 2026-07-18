@@ -5,7 +5,7 @@ import TilePool from '../components/TilePool';
 import VisionUpload from '../components/VisionUpload';
 import AuthModal from '../components/AuthModal';
 import Tile from '../components/Tile';
-import { Play, RotateCcw, LogOut, Info, Sparkles, Sun, Moon, Globe } from 'lucide-react';
+import { Play, RotateCcw, LogOut, LogIn, Info, Sparkles, Sun, Moon, Globe } from 'lucide-react';
 
 export const Dashboard: React.FC = () => {
   const {
@@ -106,9 +106,11 @@ export const Dashboard: React.FC = () => {
             ) : (
               <button
                 onClick={() => setIsAuthOpen(true)}
-                className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/20 transition-all active:scale-95 cursor-pointer"
+                className="p-1.5 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/20 transition-all active:scale-95 cursor-pointer flex items-center justify-center"
+                title={t('signIn')}
               >
-                {t('signIn')}
+                <LogIn className="w-3.5 h-3.5 sm:hidden" />
+                <span className="hidden sm:inline">{t('signIn')}</span>
               </button>
             )}
           </div>
