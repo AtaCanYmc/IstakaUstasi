@@ -22,16 +22,11 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # Copy the project files
-COPY app/main.py /app/
 COPY pyproject.toml /app/
-COPY core/ /app/core/
-COPY db/ /app/db/
-COPY models/ /app/models/
-COPY routers/ /app/routers/
-COPY services/ /app/services/
+COPY app/ /app/app/
 
 # Expose port
 EXPOSE 8000
 
-# Run the backend using uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run the backend using uvicorn as a package module
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -11,7 +11,7 @@ from okey_server.registry import VisionProviderRegistry
 from okey_server.settings import OkeyServerSettings
 
 # Import router modules
-from routers import auth_router, solver_router, vision_router
+from app.routers import auth_router, solver_router, vision_router
 
 # Setup logging
 setup_logging()
