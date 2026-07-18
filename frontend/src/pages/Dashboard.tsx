@@ -131,9 +131,9 @@ export const Dashboard: React.FC = () => {
 
         {/* Board / Rack section */}
         <section className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <h2 className="text-md font-bold text-text-secondary uppercase tracking-wider">{t('yourRack')}</h2>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <div className="flex bg-bg-secondary rounded-lg p-1 border border-card-border">
                 {(['backtracking', 'greedy', 'ilp', 'hybrid'] as const).map((strat) => (
                   <button

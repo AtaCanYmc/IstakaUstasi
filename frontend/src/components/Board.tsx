@@ -73,19 +73,19 @@ export const Board: React.FC = () => {
         <div className="absolute inset-x-0 bottom-0 h-4 bg-gradient-to-r from-[var(--rack-base-from)] via-[var(--rack-base-via)] to-[var(--rack-base-to)] border-t border-[var(--rack-border)]" />
 
         {/* Rack Rows Container */}
-        <div className="flex flex-col gap-6 sm:gap-8 pb-4">
+        <div className="flex flex-col gap-6 sm:gap-8 pb-4 overflow-x-auto scrollbar-thin">
           {/* Row 1 */}
-          <div className="relative">
+          <div className="relative min-w-[1000px] lg:min-w-0">
             {/* Shelf divider shadow line */}
             <div className="absolute inset-x-0 -bottom-3 h-1.5 bg-black/35 dark:bg-black/50 blur-[1px]" />
-            <div className="grid grid-cols-10 sm:grid-cols-20 gap-1.5 sm:gap-2 justify-center items-center">
+            <div className="grid grid-cols-20 gap-1.5 sm:gap-2 justify-center items-center">
               {row1Slots.map((index) => renderSlot(index))}
             </div>
           </div>
 
           {/* Row 2 */}
-          <div className="relative">
-            <div className="grid grid-cols-10 sm:grid-cols-20 gap-1.5 sm:gap-2 justify-center items-center">
+          <div className="relative min-w-[1000px] lg:min-w-0">
+            <div className="grid grid-cols-20 gap-1.5 sm:gap-2 justify-center items-center">
               {row2Slots.map((index) => renderSlot(index))}
             </div>
           </div>
