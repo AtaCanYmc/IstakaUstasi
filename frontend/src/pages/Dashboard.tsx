@@ -162,10 +162,17 @@ export const Dashboard: React.FC = () => {
               <button
                 onClick={solve}
                 disabled={isSolving}
-                className="px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold text-xs flex items-center gap-2 disabled:opacity-50 active:scale-95 transition-all cursor-pointer shadow-lg shadow-indigo-600/20"
+                className="p-2 sm:px-4 sm:py-2 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold text-xs flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95 transition-all cursor-pointer shadow-lg shadow-indigo-600/20"
+                title={isSolving ? t('solving') : t('arrangeMelds')}
               >
-                <Play className="w-3.5 h-3.5 fill-current" />
-                {isSolving ? t('solving') : t('arrangeMelds')}
+                {isSolving ? (
+                  <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <Play className="w-3.5 h-3.5 fill-current" />
+                )}
+                <span className="hidden sm:inline">
+                  {isSolving ? t('solving') : t('arrangeMelds')}
+                </span>
               </button>
             </div>
           </div>
