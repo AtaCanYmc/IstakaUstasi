@@ -26,7 +26,21 @@ IstakaUstasi/
 
 ## ⚡ Quick Start
 
-### 1. Run the Backend Service
+### 1. Run with Docker (Recommended)
+You can deploy both the frontend and backend inside a single network using Docker Compose.
+
+1. Ensure Docker is running.
+2. In the project root directory, run:
+   ```bash
+   docker compose up --build
+   ```
+3. Access the services:
+   * **Frontend**: Open `http://localhost:3000` in your browser.
+   * **Backend API**: Running at `http://localhost:8000`.
+
+### 2. Manual/Local Setup
+
+#### Run the Backend Service
 The backend requires Python 3.11+ and its dependencies.
 
 1. Navigate to the backend directory:
@@ -48,7 +62,7 @@ The backend requires Python 3.11+ and its dependencies.
    ```
    The backend API will run at `http://localhost:8000`. You can inspect the API swagger documentation at `http://localhost:8000/docs`.
 
-### 2. Run the Frontend App
+#### Run the Frontend App
 The frontend requires Node.js (v18+) and npm.
 
 1. Open a new terminal and navigate to the frontend directory:
