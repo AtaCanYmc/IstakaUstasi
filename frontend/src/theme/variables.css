@@ -1,0 +1,70 @@
+:root {
+  /* Common variables */
+  --font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Light mode colors */
+  --bg-primary: #f8fafc;
+  --bg-secondary: #f1f5f9;
+  --bg-tertiary: #e2e8f0;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-tertiary: #64748b;
+  --card-bg: rgba(255, 255, 255, 0.85);
+  --card-border: rgba(226, 232, 240, 0.8);
+  --input-bg: #ffffff;
+  --input-border: #cbd5e1;
+  --header-bg: rgba(248, 250, 252, 0.8);
+  --header-border: rgba(226, 232, 240, 0.8);
+  --panel-bg: rgba(241, 245, 249, 0.6);
+  --panel-border: rgba(226, 232, 240, 0.7);
+
+  /* Secondary/Utility Buttons */
+  --btn-secondary-bg: #e2e8f0;
+  --btn-secondary-text: #334155;
+  --btn-secondary-hover: #cbd5e1;
+
+  /* Tile Rack base */
+  --rack-base-from: #78350f;
+  --rack-base-via: #451a03;
+  --rack-base-to: #78350f;
+  --rack-border: #92400e;
+  --rack-bg-from: #cbd5e1;
+  --rack-bg-to: #f1f5f9;
+  --rack-slot-bg: rgba(241, 245, 249, 0.4);
+  --rack-slot-border: rgba(203, 213, 225, 0.6);
+  --rack-slot-num: #64748b;
+}
+
+:root.dark {
+  /* Dark mode colors */
+  --bg-primary: #020617;
+  --bg-secondary: #0f172a;
+  --bg-tertiary: #1e293b;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-tertiary: #64748b;
+  --card-bg: rgba(15, 23, 42, 0.6);
+  --card-border: rgba(30, 41, 59, 0.8);
+  --input-bg: #020617;
+  --input-border: #1e293b;
+  --header-bg: rgba(2, 6, 23, 0.8);
+  --header-border: rgba(15, 23, 42, 0.8);
+  --panel-bg: rgba(2, 6, 23, 0.4);
+  --panel-border: rgba(30, 41, 59, 0.6);
+
+  /* Secondary/Utility Buttons */
+  --btn-secondary-bg: #1e293b;
+  --btn-secondary-text: #94a3b8;
+  --btn-secondary-hover: #334155;
+
+  /* Tile Rack base */
+  --rack-base-from: #451a03;
+  --rack-base-via: #290b00;
+  --rack-base-to: #451a03;
+  --rack-border: #78350f;
+  --rack-bg-from: #1e293b;
+  --rack-bg-to: #0f172a;
+  --rack-slot-bg: rgba(2, 6, 23, 0.4);
+  --rack-slot-border: rgba(51, 65, 85, 0.5);
+  --rack-slot-num: #334155;
+}

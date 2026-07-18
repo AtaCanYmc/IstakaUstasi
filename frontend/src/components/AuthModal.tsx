@@ -8,7 +8,7 @@ interface AuthModalProps {
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
-  const { login, signup, isLoggingIn, authError } = useStore();
+  const { login, signup, isLoggingIn, authError, t } = useStore();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
@@ -34,37 +34,37 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="relative w-full max-w-md rounded-2xl bg-slate-900 border border-slate-800 shadow-2xl p-6 overflow-hidden">
+      <div className="relative w-full max-w-md rounded-2xl bg-card-bg border border-card-border shadow-2xl p-6 overflow-hidden">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors"
+          className="absolute top-4 right-4 p-1 rounded-lg bg-btn-sec-bg hover:bg-btn-sec-hover text-btn-sec-text hover:text-text-primary transition-colors border border-card-border cursor-pointer"
         >
           <X className="w-4 h-4" />
         </button>
 
         {/* Title */}
-        <div className="mb-6">
-          <h2 className="text-xl font-bold text-slate-100">{isLogin ? 'Sign In' : 'Create Account'}</h2>
-          <p className="text-xs text-slate-400 mt-1">
-            {isLogin ? 'Access scanning capabilities and track quotas' : 'Register for access to computer vision Okey solver'}
+        <div className="mb-6 animate-fade-in">
+          <h2 className="text-xl font-bold text-text-primary">{isLogin ? t('signIn') : t('createAccount')}</h2>
+          <p className="text-xs text-text-secondary mt-1">
+            {isLogin ? t('authDescLogin') : t('authDescRegister')}
           </p>
         </div>
 
         {/* Error Alert */}
         {authError && (
-          <div className="mb-4 p-3 rounded-lg bg-rose-950/40 border border-rose-900/40 text-rose-300 text-xs">
-            {authError}
+          <div className="mb-4 p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-300 text-xs">
+            {t(authError)}
           </div>
         )}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5 text-slate-400" />
-                Username
+            <div className="space-y-1.5 animate-slide-down">
+              <label className="text-xs font-semibold text-text-secondary flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5 text-text-tertiary" />
+                {t('username')}
               </label>
               <input
                 type="text"
@@ -72,15 +72,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="okey_master"
-                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 placeholder-slate-600 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+                className="w-full px-3 py-2 rounded-xl bg-input-bg border border-input-border text-text-primary placeholder-text-tertiary/50 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
               />
             </div>
           )}
 
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-              <Mail className="w-3.5 h-3.5 text-slate-400" />
-              Email Address
+            <label className="text-xs font-semibold text-text-secondary flex items-center gap-1.5">
+              <Mail className="w-3.5 h-3.5 text-text-tertiary" />
+              {t('email')}
             </label>
             <input
               type="email"
@@ -88,14 +88,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 placeholder-slate-600 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+              className="w-full px-3 py-2 rounded-xl bg-input-bg border border-input-border text-text-primary placeholder-text-tertiary/50 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-              <Lock className="w-3.5 h-3.5 text-slate-400" />
-              Password
+            <label className="text-xs font-semibold text-text-secondary flex items-center gap-1.5">
+              <Lock className="w-3.5 h-3.5 text-text-tertiary" />
+              {t('password')}
             </label>
             <input
               type="password"
@@ -103,7 +103,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 placeholder-slate-600 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+              className="w-full px-3 py-2 rounded-xl bg-input-bg border border-input-border text-text-primary placeholder-text-tertiary/50 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
             />
           </div>
 
@@ -115,7 +115,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             {isLoggingIn ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              <>{isLogin ? 'Login' : 'Register'}</>
+              <>{isLogin ? t('signIn') : t('signUp')}</>
             )}
           </button>
         </form>
@@ -126,9 +126,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             onClick={() => {
               setIsLogin(!isLogin);
             }}
-            className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold"
+            className="text-xs text-indigo-500 dark:text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300 font-semibold cursor-pointer"
           >
-            {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+            {isLogin ? t('noAccount') : t('hasAccount')}
           </button>
         </div>
       </div>

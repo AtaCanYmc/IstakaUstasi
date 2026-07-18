@@ -4,7 +4,7 @@ import type { TileColor, Tile as TileType } from '../services/api';
 import Tile from './Tile';
 
 export const TilePool: React.FC = () => {
-  const { addTile, okeyMeta, setOkeyMeta, clearRack } = useStore();
+  const { addTile, okeyMeta, setOkeyMeta, clearRack, t } = useStore();
   const [selectedColor, setSelectedColor] = useState<TileColor>('RED');
   const [mode, setMode] = useState<'add' | 'indicator'>('add');
 
@@ -15,11 +15,11 @@ export const TilePool: React.FC = () => {
     if (mode === 'add') {
       const added = addTile({ color, value });
       if (!added) {
-        alert('The rack is full! Remove some tiles first.');
+        alert(t('alertRackFull'));
       }
     } else {
       if (color === 'JOKER') {
-        alert('The indicator tile cannot be a JOKER!');
+        alert(t('alertJokerIndicator'));
         return;
       }
       setOkeyMeta({ color, value });
@@ -38,48 +38,48 @@ export const TilePool: React.FC = () => {
   };
 
   return (
-    <div className="w-full rounded-2xl bg-slate-900/60 border border-slate-800 p-6 backdrop-blur-md">
+    <div className="w-full rounded-2xl bg-card-bg border border-card-border p-6 backdrop-blur-md shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
         <div>
-          <h2 className="text-lg font-bold text-slate-100">Manual Tile Picker</h2>
-          <p className="text-xs text-slate-400">Click tiles to add to your board or set the indicator</p>
+          <h2 className="text-lg font-bold text-text-primary">{t('manualTilePicker')}</h2>
+          <p className="text-xs text-text-secondary">{t('pickerDesc')}</p>
         </div>
 
         <div className="flex gap-2">
           <button
             onClick={() => setMode('add')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
               mode === 'add'
                 ? 'bg-indigo-600 text-white shadow shadow-indigo-600/30'
-                : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                : 'bg-btn-sec-bg text-btn-sec-text hover:bg-btn-sec-hover'
             }`}
           >
-            Add to Rack
+            {t('addToRack')}
           </button>
           <button
             onClick={() => setMode('indicator')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
               mode === 'indicator'
                 ? 'bg-emerald-600 text-white shadow shadow-emerald-600/30'
-                : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                : 'bg-btn-sec-bg text-btn-sec-text hover:bg-btn-sec-hover'
             }`}
           >
-            Set Indicator
+            {t('setIndicator')}
           </button>
           <button
             onClick={clearRack}
-            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-950/40 text-rose-400 border border-rose-900/50 hover:bg-rose-900/40 transition-all"
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 dark:border-rose-900/50 hover:bg-rose-500/20 transition-all cursor-pointer"
           >
-            Clear Rack
+            {t('clearRack')}
           </button>
         </div>
       </div>
 
       {/* Mode Indicator Banner */}
       {mode === 'indicator' && (
-        <div className="mb-4 p-2.5 rounded-lg bg-emerald-950/40 border border-emerald-900/50 text-emerald-400 text-xs flex justify-between items-center">
-          <span>🎯 Select a tile below to set it as the <strong>Okey Indicator</strong>.</span>
-          <button onClick={() => setMode('add')} className="underline hover:text-emerald-300">Cancel</button>
+        <div className="mb-4 p-2.5 rounded-lg bg-emerald-950/20 dark:bg-emerald-950/40 border border-emerald-500/20 dark:border-emerald-900/50 text-emerald-600 dark:text-emerald-400 text-xs flex justify-between items-center animate-slide-down">
+          <span>{t('indicatorBanner')}</span>
+          <button onClick={() => setMode('add')} className="underline hover:text-emerald-500 cursor-pointer">{t('cancel')}</button>
         </div>
       )}
 
@@ -91,8 +91,8 @@ export const TilePool: React.FC = () => {
             <button
               key={color}
               onClick={() => setSelectedColor(color)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 ${getBgColor(color)} ${
-                selectedColor === color ? 'ring-2 ring-indigo-500 ring-offset-2 ring-offset-slate-900 scale-105' : 'opacity-70 hover:opacity-100'
+              className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer ${getBgColor(color)} ${
+                selectedColor === color ? 'ring-2 ring-indigo-500 ring-offset-2 ring-offset-bg-primary scale-105' : 'opacity-70 hover:opacity-100'
               }`}
             >
               {color}
@@ -101,16 +101,16 @@ export const TilePool: React.FC = () => {
         </div>
 
         {/* Numbers/Values Grid */}
-        <div className="bg-slate-950/30 p-4 rounded-xl border border-slate-800/60">
+        <div className="bg-panel-bg p-4 rounded-xl border border-panel-border">
           {selectedColor === 'JOKER' ? (
             <div className="flex flex-col items-center justify-center p-6 gap-3">
               <button
                 onClick={() => handleTileClick('JOKER', 0)}
-                className="w-16 h-24 rounded-xl font-extrabold text-3xl flex items-center justify-center border-t border-b-4 border-x border-rose-300 bg-radial from-amber-50 to-amber-100 text-rose-600 shadow-lg hover:scale-105 transition-transform"
+                className="w-16 h-24 rounded-xl font-extrabold text-3xl flex items-center justify-center border-t border-b-4 border-x border-rose-300 bg-radial from-amber-50 to-amber-100 text-rose-600 shadow-lg hover:scale-105 transition-transform cursor-pointer"
               >
                 ★
               </button>
-              <span className="text-xs text-slate-400">Spawn a Joker Tile (Wildcard)</span>
+              <span className="text-xs text-text-secondary">{t('spawnJoker')}</span>
             </div>
           ) : (
             <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-13 gap-2">
@@ -121,7 +121,7 @@ export const TilePool: React.FC = () => {
                   <button
                     key={num}
                     onClick={() => handleTileClick(selectedColor, num)}
-                    className="flex justify-center hover:scale-105 transition-transform"
+                    className="flex justify-center hover:scale-105 transition-transform cursor-pointer"
                   >
                     <Tile tile={mockTile} />
                   </button>
@@ -132,10 +132,10 @@ export const TilePool: React.FC = () => {
         </div>
 
         {/* Okey Meta Display */}
-        <div className="flex items-center gap-4 p-4 rounded-xl bg-slate-950/40 border border-slate-800/80">
-          <div className="text-slate-300 text-xs">
-            <span className="block font-bold text-slate-100">Okey Indicator Tile</span>
-            {okeyMeta ? 'Determines the active joker for calculations.' : 'Not set. Joker tiles default to standard behavior.'}
+        <div className="flex items-center gap-4 p-4 rounded-xl bg-panel-bg border border-panel-border">
+          <div className="text-text-secondary text-xs">
+            <span className="block font-bold text-text-primary">{t('indicatorTile')}</span>
+            {okeyMeta ? t('indicatorActive') : t('indicatorNotSet')}
           </div>
           <div className="ml-auto">
             {okeyMeta ? (
@@ -143,14 +143,14 @@ export const TilePool: React.FC = () => {
                 <Tile tile={{ id: 'indicator', ...okeyMeta }} isIndicator />
                 <button
                   onClick={() => setOkeyMeta(null)}
-                  className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 text-xs"
+                  className="p-1.5 rounded bg-btn-sec-bg hover:bg-btn-sec-hover text-btn-sec-text border border-card-border hover:text-text-primary text-xs cursor-pointer"
                 >
-                  Clear
+                  {t('cancel')}
                 </button>
               </div>
             ) : (
-              <div className="w-11 h-16 rounded-lg border-2 border-dashed border-slate-700 flex items-center justify-center text-slate-600 text-xs font-bold">
-                NONE
+              <div className="w-11 h-16 rounded-lg border-2 border-dashed border-panel-border flex items-center justify-center text-text-tertiary text-xs font-bold bg-input-bg">
+                {t('none')}
               </div>
             )}
           </div>

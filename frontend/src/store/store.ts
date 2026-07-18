@@ -1,8 +1,16 @@
 import { create } from 'zustand';
 import apiService from '../services/api';
 import type { Tile, OkeyMeta, Arrangement, UserProfile } from '../services/api';
+import { translations, type Language } from '../i18n/translations';
 
 interface SolverState {
+  // Theme and Localization
+  language: Language;
+  theme: 'light' | 'dark';
+  setLanguage: (lang: Language) => void;
+  toggleTheme: () => void;
+  t: (key: string, params?: Record<string, string | number>) => string;
+
   // Auth
   user: UserProfile | null;
   token: string | null;
@@ -53,6 +61,38 @@ interface SolverState {
 const RACK_SIZE = 40;
 
 export const useStore = create<SolverState>((set, get) => ({
+  // Theme and Localization
+  language: 'tr',
+  theme: 'dark',
+  setLanguage: (lang) => {
+    localStorage.setItem('language', lang);
+    set({ language: lang });
+  },
+  toggleTheme: () => {
+    const nextTheme = get().theme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('theme', nextTheme);
+    if (nextTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    set({ theme: nextTheme });
+  },
+  t: (key, params) => {
+    const lang = get().language;
+    const dict = translations[lang] || translations['tr'];
+    const translation = dict[key as keyof typeof translations['tr']];
+    if (!translation) return key;
+    if (params) {
+      let result = translation;
+      Object.entries(params).forEach(([k, v]) => {
+        result = result.replace(`{${k}}`, String(v));
+      });
+      return result;
+    }
+    return translation;
+  },
+
   user: null,
   token: null,
   isLoggingIn: false,
@@ -73,6 +113,23 @@ export const useStore = create<SolverState>((set, get) => ({
   setToken: (token) => set({ token }),
 
   initializeAuth: () => {
+    // Load language preference
+    const savedLang = localStorage.getItem('language') as Language;
+    const browserLang = navigator.language.split('-')[0] as Language;
+    const initialLang = savedLang || (['tr', 'en', 'fr', 'de'].includes(browserLang) ? browserLang : 'tr');
+
+    // Load theme preference
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
+    const initialTheme = savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+    if (initialTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
+    set({ language: initialLang, theme: initialTheme });
+
     const token = localStorage.getItem('token');
     const userStr = localStorage.getItem('user');
     if (token && userStr) {

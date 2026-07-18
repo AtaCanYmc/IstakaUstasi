@@ -40,7 +40,7 @@ export const Tile: React.FC<TileProps> = ({ tile, isIndicator = false, onClick, 
         w-11 h-16 sm:w-12 sm:h-18 rounded-lg font-bold text-xl sm:text-2xl shadow-md border-t border-b-4 border-x
         bg-gradient-to-b from-amber-50 to-amber-100/90 active:scale-95 transition-all
         ${getColorStyles(tile.color)}
-        ${isIndicator ? 'ring-2 ring-emerald-500 ring-offset-2 ring-offset-slate-900 shadow-emerald-500/20' : 'shadow-black/30'}`}
+        ${isIndicator ? 'ring-2 ring-emerald-500 ring-offset-2 ring-offset-bg-primary shadow-emerald-500/20' : 'shadow-black/30'}`}
       style={{
         textShadow: '0.5px 0.5px 0px rgba(0, 0, 0, 0.15)',
       }}
