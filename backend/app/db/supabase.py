@@ -10,6 +10,7 @@ from app.db.base import (
     IUserRepository,
     SystemLogCreate,
     UserProfile,
+    UserQuota,
 )
 
 logger = structlog.get_logger("okey_bridge_server.db.supabase")
@@ -35,7 +36,37 @@ class SupabaseUserRepository(IUserRepository):
         res = self.client.table("users").select("*").eq("id", user_id).execute()
         if not res.data:
             return None
-        return self._map_user_data(res.data[0])
+
+        # Load quotas from user_quotas table
+        quota_res = (
+            self.client.table("user_quotas")
+            .select("*")
+            .eq("user_id", user_id)
+            .execute()
+        )
+        quotas = {
+            item["quota_type"]: UserQuota(
+                user_id=item["user_id"],
+                quota_type=item["quota_type"],
+                quota_count=item["quota_count"],
+                last_reset_date=item["last_reset_date"],
+            )
+            for item in quota_res.data
+        }
+
+        user_data = res.data[0]
+        user_data["image_quota_count"] = (
+            quotas.get("image").quota_count if quotas.get("image") else 5
+        )
+        user_data["solver_quota_count"] = (
+            quotas.get("solver").quota_count if quotas.get("solver") else 20
+        )
+        user_data["last_reset_date"] = (
+            quotas.get("image").last_reset_date
+            if quotas.get("image")
+            else user_data.get("created_at")
+        )
+        return self._map_user_data(user_data)
 
     async def create_user(
         self,
@@ -52,21 +83,73 @@ class SupabaseUserRepository(IUserRepository):
             "id": user_id,
             "email": email,
             "username": username or email.split("@")[0],
-            "image_quota_count": initial_image_quota,
-            "solver_quota_count": initial_solver_quota,
-            "last_reset_date": now_str,
             "created_at": now_str,
             "updated_at": now_str,
         }
         res = self.client.table("users").insert(new_user).execute()
-        return self._map_user_data(res.data[0])
+
+        # Create initial quotas
+        self.client.table("user_quotas").insert(
+            [
+                {
+                    "user_id": user_id,
+                    "quota_type": "image",
+                    "quota_count": initial_image_quota,
+                    "last_reset_date": now_str,
+                },
+                {
+                    "user_id": user_id,
+                    "quota_type": "solver",
+                    "quota_count": initial_solver_quota,
+                    "last_reset_date": now_str,
+                },
+            ]
+        ).execute()
+
+        user_data = res.data[0]
+        user_data["image_quota_count"] = initial_image_quota
+        user_data["solver_quota_count"] = initial_solver_quota
+        user_data["last_reset_date"] = now_str
+        return self._map_user_data(user_data)
 
     async def update_user(self, user_id: str, updates: Dict[str, Any]) -> UserProfile:
         from datetime import datetime, timezone
 
-        updates["updated_at"] = datetime.now(timezone.utc).isoformat()
-        res = self.client.table("users").update(updates).eq("id", user_id).execute()
-        return self._map_user_data(res.data[0])
+        updates_copy = dict(updates)
+        now_str = datetime.now(timezone.utc).isoformat()
+
+        # Extract quota parameters if present
+        image_quota = updates_copy.pop("image_quota_count", None)
+        solver_quota = updates_copy.pop("solver_quota_count", None)
+        last_reset = updates_copy.pop("last_reset_date", None)
+
+        if updates_copy:
+            updates_copy["updated_at"] = now_str
+            self.client.table("users").update(updates_copy).eq("id", user_id).execute()
+
+        if image_quota is not None:
+            quota_up: Dict[str, Any] = {"quota_count": image_quota}
+            if last_reset:
+                quota_up["last_reset_date"] = last_reset
+            self.client.table("user_quotas").upsert(
+                {"user_id": user_id, "quota_type": "image", **quota_up},
+                on_conflict="user_id,quota_type",
+            ).execute()
+
+        if solver_quota is not None:
+            quota_up = {"quota_count": solver_quota}
+            if last_reset:
+                quota_up["last_reset_date"] = last_reset
+            self.client.table("user_quotas").upsert(
+                {"user_id": user_id, "quota_type": "solver", **quota_up},
+                on_conflict="user_id,quota_type",
+            ).execute()
+
+        # Retrieve fully integrated user record
+        final_user = await self.get_user(user_id)
+        if not final_user:
+            raise ValueError("Failed to retrieve user after updates")
+        return final_user
 
 
 class SupabaseSystemLogRepository(ISystemLogRepository):

@@ -26,6 +26,13 @@ class UserProfile(BaseModel):
     updated_at: str
 
 
+class UserQuota(BaseModel):
+    user_id: str
+    quota_type: str
+    quota_count: int
+    last_reset_date: str
+
+
 class IUserRepository(ABC):
     @abstractmethod
     async def get_user(self, user_id: str) -> Optional[UserProfile]:
