@@ -38,28 +38,28 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-bg-primary pb-20 safe-pb safe-pt safe-pl safe-pr text-text-primary selection:bg-indigo-500 selection:text-white">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-header-bg/85 backdrop-blur-md border-b border-header-border px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center font-black text-white text-xl shadow-lg shadow-indigo-500/20">
+      <header className="sticky top-0 z-40 bg-header-bg/85 backdrop-blur-md border-b border-header-border px-4 py-3 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center font-black text-white text-lg sm:text-xl shadow-lg shadow-indigo-500/20">
             🀄
           </div>
           <div>
-            <h1 className="text-md sm:text-lg font-black tracking-tight text-text-primary">
+            <h1 className="text-sm sm:text-lg font-black tracking-tight text-text-primary">
               {t('title')}
             </h1>
-            <p className="text-[10px] text-indigo-500 dark:text-indigo-400 font-medium">{t('subtitle')}</p>
+            <p className="hidden sm:block text-[10px] text-indigo-500 dark:text-indigo-400 font-medium">{t('subtitle')}</p>
           </div>
         </div>
 
-        {/* Controls: Language and Theme */}
-        <div className="flex items-center gap-2 sm:gap-3 mr-auto ml-4 sm:ml-8">
-          {/* Language Selector */}
+        {/* Right controls and profile group */}
+        <div className="flex items-center gap-1.5 sm:gap-3">
+          {/* Controls: Language and Theme */}
           <div className="relative group">
-            <button className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-btn-sec-bg hover:bg-btn-sec-hover text-btn-sec-text text-xs font-bold transition-all border border-card-border cursor-pointer">
-              <Globe className="w-3.5 h-3.5" />
+            <button className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-btn-sec-bg hover:bg-btn-sec-hover text-btn-sec-text text-[10px] sm:text-xs font-bold transition-all border border-card-border cursor-pointer">
+              <Globe className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
               <span className="uppercase">{language}</span>
             </button>
-            <div className="absolute left-0 mt-1 hidden group-hover:block hover:block bg-card-bg border border-card-border rounded-xl shadow-xl py-1 z-50 min-w-[100px]">
+            <div className="absolute right-0 mt-1 hidden group-hover:block hover:block bg-card-bg border border-card-border rounded-xl shadow-xl py-1 z-50 min-w-[100px]">
               {(['tr', 'en', 'fr', 'de'] as const).map((lang) => (
                 <button
                   key={lang}
@@ -74,43 +74,44 @@ export const Dashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Theme Selector */}
           <button
             onClick={toggleTheme}
             className="p-1.5 rounded-lg bg-btn-sec-bg hover:bg-btn-sec-hover text-btn-sec-text transition-all border border-card-border cursor-pointer"
             title={theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
           >
-            {theme === 'dark' ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+            {theme === 'dark' ? <Sun className="w-3 sm:w-3.5 h-3 sm:h-3.5" /> : <Moon className="w-3 sm:w-3.5 h-3 sm:h-3.5" />}
           </button>
-        </div>
 
-        {/* User profile / Login */}
-        <div className="flex items-center gap-4">
-          {token && user ? (
-            <div className="flex items-center gap-3">
-              <div className="hidden sm:block text-right">
-                <span className="block text-xs font-bold text-text-primary">{user.username}</span>
-                <span className="block text-[10px] text-text-tertiary">{user.email}</span>
+          <div className="h-4 w-px bg-card-border mx-0.5 sm:mx-1" />
+
+          {/* User profile / Login */}
+          <div className="flex items-center gap-2">
+            {token && user ? (
+              <div className="flex items-center gap-2">
+                <div className="hidden sm:block text-right">
+                  <span className="block text-xs font-bold text-text-primary">{user.username}</span>
+                  <span className="block text-[10px] text-text-tertiary">{user.email}</span>
+                </div>
+                <div className="h-7 sm:h-8 w-7 sm:w-8 rounded-lg bg-indigo-950/20 border border-indigo-500/30 flex items-center justify-center font-bold text-[10px] sm:text-xs text-indigo-500 dark:text-indigo-300">
+                  {user.username.slice(0, 2).toUpperCase()}
+                </div>
+                <button
+                  onClick={logout}
+                  className="p-1.5 sm:p-2 rounded-lg bg-btn-sec-bg hover:bg-btn-sec-hover text-btn-sec-text hover:text-rose-500 transition-colors border border-card-border cursor-pointer"
+                  title={t('signOut')}
+                >
+                  <LogOut className="w-3 sm:w-4 h-3 sm:h-4" />
+                </button>
               </div>
-              <div className="h-8 w-8 rounded-lg bg-indigo-950/20 border border-indigo-500/30 flex items-center justify-center font-bold text-xs text-indigo-500 dark:text-indigo-300">
-                {user.username.slice(0, 2).toUpperCase()}
-              </div>
+            ) : (
               <button
-                onClick={logout}
-                className="p-2 rounded-lg bg-btn-sec-bg hover:bg-btn-sec-hover text-btn-sec-text hover:text-rose-500 transition-colors border border-card-border cursor-pointer"
-                title={t('signOut')}
+                onClick={() => setIsAuthOpen(true)}
+                className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/20 transition-all active:scale-95 cursor-pointer"
               >
-                <LogOut className="w-4 h-4" />
+                {t('signIn')}
               </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => setIsAuthOpen(true)}
-              className="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/20 transition-all active:scale-95 cursor-pointer"
-            >
-              {t('signIn')}
-            </button>
-          )}
+            )}
+          </div>
         </div>
       </header>
 
