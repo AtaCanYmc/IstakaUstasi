@@ -1,0 +1,292 @@
+import { create } from 'zustand';
+import apiService from '../services/api';
+import type { Tile, OkeyMeta, Arrangement, UserProfile } from '../services/api';
+
+interface SolverState {
+  // Auth
+  user: UserProfile | null;
+  token: string | null;
+  isLoggingIn: boolean;
+  authError: string | null;
+
+  // Rack Grid (2 rows of 20 slots = 40 slots)
+  rack: (Tile | null)[];
+  okeyMeta: OkeyMeta | null;
+  strategy: 'backtracking' | 'greedy' | 'ilp' | 'hybrid';
+  isSolving: boolean;
+  solveError: string | null;
+  solverResult: Arrangement | null;
+
+  // Vision
+  isProcessingVision: boolean;
+  visionError: string | null;
+  visionConfigured: boolean;
+
+  // Setters & Actions
+  setUser: (user: UserProfile | null) => void;
+  setToken: (token: string | null) => void;
+  initializeAuth: () => void;
+  login: (email: string, password: string) => Promise<void>;
+  signup: (email: string, username: string, password: string) => Promise<void>;
+  logout: () => void;
+  refreshQuota: () => Promise<void>;
+
+  // Rack actions
+  setRack: (rack: (Tile | null)[]) => void;
+  clearRack: () => void;
+  addTile: (tile: Omit<Tile, 'id'>) => boolean;
+  removeTile: (index: number) => void;
+  moveTile: (fromIndex: number, toIndex: number) => void;
+  setOkeyMeta: (meta: OkeyMeta | null) => void;
+  setStrategy: (strategy: 'backtracking' | 'greedy' | 'ilp' | 'hybrid') => void;
+
+  // Solver
+  solve: () => Promise<void>;
+  applyArrangement: (arrangement: Arrangement) => void;
+
+  // Vision
+  uploadImageExtract: (file: File) => Promise<void>;
+  uploadImageSolve: (file: File) => Promise<void>;
+  checkHealth: () => Promise<void>;
+}
+
+const RACK_SIZE = 40;
+
+export const useStore = create<SolverState>((set, get) => ({
+  user: null,
+  token: null,
+  isLoggingIn: false,
+  authError: null,
+
+  rack: Array(RACK_SIZE).fill(null),
+  okeyMeta: null,
+  strategy: 'backtracking',
+  isSolving: false,
+  solveError: null,
+  solverResult: null,
+
+  isProcessingVision: false,
+  visionError: null,
+  visionConfigured: false,
+
+  setUser: (user) => set({ user }),
+  setToken: (token) => set({ token }),
+
+  initializeAuth: () => {
+    const token = localStorage.getItem('token');
+    const userStr = localStorage.getItem('user');
+    if (token && userStr) {
+      try {
+        set({ token, user: JSON.parse(userStr) });
+        // Optionally sync user state from DB
+        apiService.syncUser()
+          .then((res) => {
+            set({ user: res.profile });
+            localStorage.setItem('user', JSON.stringify(res.profile));
+          })
+          .catch(() => {});
+      } catch (e) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
+    }
+  },
+
+  login: async (email, password) => {
+    set({ isLoggingIn: true, authError: null });
+    try {
+      const data = await apiService.login(email, password);
+      localStorage.setItem('token', data.access_token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      set({ token: data.access_token, user: data.user, isLoggingIn: false });
+    } catch (err: any) {
+      const msg = err.response?.data?.detail || 'Login failed. Please check your credentials.';
+      set({ authError: msg, isLoggingIn: false });
+      throw err;
+    }
+  },
+
+  signup: async (email, username, password) => {
+    set({ isLoggingIn: true, authError: null });
+    try {
+      const data = await apiService.signup(email, username, password);
+      localStorage.setItem('token', data.access_token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      set({ token: data.access_token, user: data.user, isLoggingIn: false });
+    } catch (err: any) {
+      const msg = err.response?.data?.detail || 'Signup failed. Please try again.';
+      set({ authError: msg, isLoggingIn: false });
+      throw err;
+    }
+  },
+
+  logout: () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    set({ token: null, user: null });
+  },
+
+  refreshQuota: async () => {
+    if (!get().token) return;
+    try {
+      const res = await apiService.syncUser();
+      set({ user: res.profile });
+      localStorage.setItem('user', JSON.stringify(res.profile));
+    } catch (err) {}
+  },
+
+  setRack: (rack) => set({ rack }),
+
+  clearRack: () => set({ rack: Array(RACK_SIZE).fill(null), solverResult: null }),
+
+  addTile: (tileData) => {
+    const rack = [...get().rack];
+    const firstEmptyIndex = rack.findIndex(t => t === null);
+    if (firstEmptyIndex === -1) return false;
+
+    const newTile: Tile = {
+      ...tileData,
+      id: `${tileData.color.toLowerCase()}_${tileData.value}_${Math.random().toString(36).substr(2, 9)}`
+    };
+
+    rack[firstEmptyIndex] = newTile;
+    set({ rack });
+    return true;
+  },
+
+  removeTile: (index) => {
+    const rack = [...get().rack];
+    rack[index] = null;
+    set({ rack });
+  },
+
+  moveTile: (fromIndex, toIndex) => {
+    const rack = [...get().rack];
+    const [moved] = rack.splice(fromIndex, 1);
+    // Put null back in fromIndex to keep the length
+    rack.splice(fromIndex, 0, null);
+    // Overwrite the slot at toIndex
+    rack[toIndex] = moved;
+    set({ rack });
+  },
+
+  setOkeyMeta: (okeyMeta) => set({ okeyMeta }),
+
+  setStrategy: (strategy) => set({ strategy }),
+
+  solve: async () => {
+    const activeTiles = get().rack.filter((t): t is Tile => t !== null);
+    if (activeTiles.length === 0) {
+      set({ solveError: 'Rack is empty! Add tiles before solving.' });
+      return;
+    }
+    set({ isSolving: true, solveError: null });
+    try {
+      const arrangement = await apiService.arrangeHand(activeTiles, get().okeyMeta, get().strategy);
+      set({ solverResult: arrangement, isSolving: false });
+      get().applyArrangement(arrangement);
+    } catch (err: any) {
+      const msg = err.response?.data?.detail || 'Solver error occurred.';
+      set({ solveError: msg, isSolving: false });
+    }
+  },
+
+  applyArrangement: (arrangement) => {
+    // Lay out melds and remaining tiles visually onto a 2-row x 20-col rack
+    const newRack: (Tile | null)[] = Array(RACK_SIZE).fill(null);
+    let currentIdx = 0;
+
+    // Place each meld on the rack with an empty space between them
+    arrangement.melds.forEach((meld) => {
+      // Check if this meld fits in the current row (first row ends at 19, second at 39)
+      const meldLength = meld.tiles.length;
+
+      // If it would cross row boundaries, wrap to the next row (if we are on the first row)
+      if (currentIdx < 20 && currentIdx + meldLength > 20) {
+        currentIdx = 20; // wrap to 2nd row
+      }
+
+      // Check if we still have space
+      if (currentIdx + meldLength <= RACK_SIZE) {
+        meld.tiles.forEach((tile) => {
+          newRack[currentIdx++] = tile;
+        });
+        // Leave a space after the meld if it doesn't end the row
+        if (currentIdx < 20 || (currentIdx > 20 && currentIdx < 40)) {
+          currentIdx++; // skip one space
+        }
+      }
+    });
+
+    // Move to next row or skip a slot before remaining tiles if they exist
+    if (arrangement.remainingTiles.length > 0) {
+      if (currentIdx < 20) {
+        currentIdx = 20; // Put remaining tiles on the second row
+      } else {
+        // Just leave some space if we are already on the second row
+        if (currentIdx < 40) currentIdx++;
+      }
+
+      arrangement.remainingTiles.forEach((tile) => {
+        if (currentIdx < RACK_SIZE) {
+          newRack[currentIdx++] = tile;
+        }
+      });
+    }
+
+    set({ rack: newRack });
+  },
+
+  uploadImageExtract: async (file) => {
+    set({ isProcessingVision: true, visionError: null });
+    try {
+      const res = await apiService.extractTiles(file);
+      // Place extracted tiles on the board
+      const newRack = Array(RACK_SIZE).fill(null);
+      res.tiles.forEach((tile, index) => {
+        if (index < RACK_SIZE) {
+          newRack[index] = tile;
+        }
+      });
+      set({ rack: newRack, isProcessingVision: false });
+      await get().refreshQuota();
+    } catch (err: any) {
+      const msg = err.response?.data?.detail || 'Failed to extract tiles from image.';
+      set({ visionError: msg, isProcessingVision: false });
+      throw err;
+    }
+  },
+
+  uploadImageSolve: async (file) => {
+    set({ isProcessingVision: true, visionError: null });
+    try {
+      const res = await apiService.solveVision(file, get().okeyMeta);
+      if (res.arrangement) {
+        set({ solverResult: res.arrangement });
+        get().applyArrangement(res.arrangement);
+      } else {
+        // Place just the tiles on the board
+        const newRack = Array(RACK_SIZE).fill(null);
+        res.tiles.forEach((tile, index) => {
+          if (index < RACK_SIZE) {
+            newRack[index] = tile;
+          }
+        });
+        set({ rack: newRack });
+      }
+      set({ isProcessingVision: false });
+      await get().refreshQuota();
+    } catch (err: any) {
+      const msg = err.response?.data?.detail || 'Failed to solve hand from image.';
+      set({ visionError: msg, isProcessingVision: false });
+      throw err;
+    }
+  },
+
+  checkHealth: async () => {
+    try {
+      const data = await apiService.getHealth();
+      set({ visionConfigured: data.vision_configured });
+    } catch (err) {}
+  }
+}));
