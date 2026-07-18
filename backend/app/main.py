@@ -1,3 +1,5 @@
+from typing import Any
+
 import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,11 +10,8 @@ from okey_server.registry import VisionProviderRegistry
 # Import state configs and configurations
 from okey_server.settings import OkeyServerSettings
 
-from src.routers import router as vision_router
-
 # Import router modules
-from src.routers.auth import router as auth_router
-from src.routers.solver import router as solver_router
+from routers import auth_router, solver_router, vision_router
 
 # Setup logging
 setup_logging()
@@ -33,8 +32,9 @@ setup_opentelemetry(app)
 
 # Load configuration and state
 settings = OkeyServerSettings()
-app.state.settings = settings
-app.state.provider_registry = VisionProviderRegistry()
+state: Any = app.state
+state.settings = settings
+state.provider_registry = VisionProviderRegistry()
 
 # Configure CORS
 app.add_middleware(

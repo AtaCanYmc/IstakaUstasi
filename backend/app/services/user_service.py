@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional
 
 import structlog
 
-from src.db import DatabaseFactory
+from app.db import DatabaseFactory
 
 logger = structlog.get_logger("okey_bridge_server.services.user")
 
@@ -95,7 +95,7 @@ class UserService:
             new_quota = quota - 1
             await user_repo.update_user(user_id, {"image_quota_count": new_quota})
 
-            from src.db.base import SystemLogCreate
+            from app.db.base import SystemLogCreate
 
             await log_repo.create_log(
                 SystemLogCreate(

@@ -7,9 +7,9 @@ from fastapi import APIRouter, Depends, Form, HTTPException
 from okey_core.types import OkeyMeta, OrchestratorResult, TileColor
 from okey_server.dependencies import get_roboflow_workflow_provider, validate_image_file
 
-from src.dependencies.auth import get_current_user
-from src.models.vision import ExtractResultCustom
-from src.services.user_service import UserService
+from app.dependencies.auth import get_current_user
+from app.models.vision import ExtractResultCustom
+from app.services.user_service import UserService
 
 logger = structlog.get_logger("okey_bridge_server.routers.vision")
 router = APIRouter(prefix="/vision", tags=["Vision"])

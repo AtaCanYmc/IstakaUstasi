@@ -2,7 +2,7 @@ import structlog
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from src.db import DatabaseFactory
+from app.db import DatabaseFactory
 
 logger = structlog.get_logger("okey_bridge_server.dependencies.auth")
 security = HTTPBearer()

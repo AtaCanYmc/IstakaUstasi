@@ -1,8 +1,8 @@
 import os
 from typing import Optional
 
-from src.db.base import IDatabaseProvider
-from src.db.supabase import SupabaseDatabaseProvider
+from app.db.base import IDatabaseProvider
+from app.db.supabase import SupabaseDatabaseProvider
 
 
 class DatabaseFactory:

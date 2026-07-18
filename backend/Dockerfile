@@ -22,7 +22,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # Copy the project files
-COPY main.py /app/
+COPY app/main.py /app/
 COPY pyproject.toml /app/
 COPY core/ /app/core/
 COPY db/ /app/db/

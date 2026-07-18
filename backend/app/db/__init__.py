@@ -1,12 +1,12 @@
 # Database package
-from src.db.base import (
+from app.db.base import (
     IDatabaseProvider,
     ISystemLogRepository,
     IUserRepository,
     SystemLogCreate,
     UserProfile,
 )
-from src.db.factory import DatabaseFactory
+from app.db.factory import DatabaseFactory
 
 __all__ = [
     "IDatabaseProvider",

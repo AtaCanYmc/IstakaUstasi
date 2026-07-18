@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional
 import structlog
 from supabase import Client, create_client
 
-from src.db.base import (
+from app.db.base import (
     IDatabaseProvider,
     ISystemLogRepository,
     IUserRepository,
