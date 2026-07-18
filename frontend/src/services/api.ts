@@ -93,18 +93,39 @@ export const apiService = {
   },
 
   async syncUser(): Promise<{ message: string; profile: UserProfile }> {
-    const res = await api.post('/auth/sync');
-    return res.data;
+    try {
+      const res = await api.post('/auth/sync');
+      localStorage.setItem('cached_profile', JSON.stringify(res.data));
+      return res.data;
+    } catch (error) {
+      const cached = localStorage.getItem('cached_profile');
+      if (cached) {
+        console.warn('Network error: Using cached user profile offline.');
+        return JSON.parse(cached);
+      }
+      throw error;
+    }
   },
 
   // Solver API
   async arrangeHand(tiles: Tile[], okeyMeta: OkeyMeta | null, strategy: string = 'backtracking'): Promise<Arrangement> {
-    const res = await api.post<Arrangement>('/solver/arrange', {
-      tiles,
-      okey_meta: okeyMeta,
-      strategy,
-    });
-    return res.data;
+    const cacheKey = `offline_arrange_${JSON.stringify({ tiles, okeyMeta, strategy })}`;
+    try {
+      const res = await api.post<Arrangement>('/solver/arrange', {
+        tiles,
+        okey_meta: okeyMeta,
+        strategy,
+      });
+      localStorage.setItem(cacheKey, JSON.stringify(res.data));
+      return res.data;
+    } catch (error) {
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        console.warn('Network error: Using cached hand arrangement offline.');
+        return JSON.parse(cached);
+      }
+      throw error;
+    }
   },
 
   // Vision API

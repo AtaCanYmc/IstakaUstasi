@@ -29,7 +29,7 @@ export const Board: React.FC = () => {
                     ref={dragProvided.innerRef}
                     {...dragProvided.draggableProps}
                     {...dragProvided.dragHandleProps}
-                    className={`group absolute z-10 transition-transform ${
+                    className={`group absolute z-10 transition-transform touch-none ${
                       dragSnapshot.isDragging ? 'rotate-3 scale-105 z-50' : ''
                     }`}
                   >

@@ -51,3 +51,29 @@
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-secondary);
 }
+
+/* Touch interaction & safe-area classes for mobile optimization */
+.touch-none {
+  touch-action: none;
+}
+
+.safe-pb {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-pt {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-pr {
+  padding-right: env(safe-area-inset-right);
+}
+
+.safe-pl {
+  padding-left: env(safe-area-inset-left);
+}
+
+body {
+  /* Prevent pull-to-refresh and bouncing on mobile devices */
+  overscroll-behavior-y: contain;
+}

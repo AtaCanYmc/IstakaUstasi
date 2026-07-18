@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import Board from "./Board";
@@ -19,10 +19,10 @@ vi.mock("../store/store", () => {
 
 describe("Board Component", () => {
   it("renders all 40 slots on the board", () => {
-    render(<Board />);
+    const { getByText } = render(<Board />);
     // Check that we render slot numbers 1 to 40
     for (let i = 1; i <= 40; i++) {
-      expect(screen.getByText(String(i))).not.toBeNull();
+      expect(getByText(String(i))).not.toBeNull();
     }
   });
 });

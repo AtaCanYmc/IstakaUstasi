@@ -36,7 +36,7 @@ export const Dashboard: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-bg-primary pb-20 text-text-primary selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-bg-primary pb-20 safe-pb safe-pt safe-pl safe-pr text-text-primary selection:bg-indigo-500 selection:text-white">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-header-bg/85 backdrop-blur-md border-b border-header-border px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
