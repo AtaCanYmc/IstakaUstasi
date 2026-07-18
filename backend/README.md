@@ -115,7 +115,7 @@ The container handles OpenCV native OS libraries automatically and mounts your `
 
 ## Supabase PostgreSQL Schema Setup
 
-Execute the following commands in the Supabase SQL editor to initialize tables under the `public` schema:
+Database schema migrations are managed directly via the Supabase CLI or console rather than local Python tools like Alembic. Execute the following commands in the Supabase SQL editor to initialize tables under the `public` schema:
 
 ```sql
 create table public.users (

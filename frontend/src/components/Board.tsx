@@ -5,7 +5,9 @@ import { useStore } from '../store/store';
 import Tile from './Tile';
 
 export const Board: React.FC = () => {
-  const { rack, moveTile, removeTile } = useStore();
+  const rack = useStore((state) => state.rack);
+  const moveTile = useStore((state) => state.moveTile);
+  const removeTile = useStore((state) => state.removeTile);
 
   const renderSlot = (index: number) => {
     const tile = rack[index];

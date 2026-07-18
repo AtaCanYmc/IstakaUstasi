@@ -4,7 +4,11 @@ import type { TileColor, Tile as TileType } from '../services/api';
 import Tile from './Tile';
 
 export const TilePool: React.FC = () => {
-  const { addTile, okeyMeta, setOkeyMeta, clearRack, t } = useStore();
+  const addTile = useStore((state) => state.addTile);
+  const okeyMeta = useStore((state) => state.okeyMeta);
+  const setOkeyMeta = useStore((state) => state.setOkeyMeta);
+  const clearRack = useStore((state) => state.clearRack);
+  const t = useStore((state) => state.t);
   const [selectedColor, setSelectedColor] = useState<TileColor>('RED');
   const [mode, setMode] = useState<'add' | 'indicator'>('add');
 

@@ -297,10 +297,29 @@ export const useStore = create<SolverState>((set, get) => ({
   uploadImageExtract: async (file) => {
     set({ isProcessingVision: true, visionError: null });
     try {
-      const res = await apiService.extractTiles(file);
+      const jobResponse = await apiService.extractTiles(file);
+
+      // Poll job status
+      const pollJob = async (jobId: string, intervalMs = 1000, timeoutMs = 60000): Promise<any> => {
+        const startTime = Date.now();
+        while (Date.now() - startTime < timeoutMs) {
+          const job = await apiService.getJobStatus(jobId);
+          if (job.status === 'completed') {
+            return job.result;
+          }
+          if (job.status === 'failed') {
+            throw new Error(job.error || 'Job failed processing on the server.');
+          }
+          await new Promise(resolve => setTimeout(resolve, intervalMs));
+        }
+        throw new Error('Processing timed out on the server.');
+      };
+
+      const res = await pollJob(jobResponse.job_id);
+
       // Place extracted tiles on the board
       const newRack = Array(RACK_SIZE).fill(null);
-      res.tiles.forEach((tile, index) => {
+      res.tiles.forEach((tile: any, index: number) => {
         if (index < RACK_SIZE) {
           newRack[index] = tile;
         }
@@ -308,7 +327,7 @@ export const useStore = create<SolverState>((set, get) => ({
       set({ rack: newRack, isProcessingVision: false });
       await get().refreshQuota();
     } catch (err: any) {
-      const msg = err.response?.data?.detail || 'Failed to extract tiles from image.';
+      const msg = err.response?.data?.detail || err.message || 'Failed to extract tiles from image.';
       set({ visionError: msg, isProcessingVision: false });
       throw err;
     }
@@ -317,14 +336,33 @@ export const useStore = create<SolverState>((set, get) => ({
   uploadImageSolve: async (file) => {
     set({ isProcessingVision: true, visionError: null });
     try {
-      const res = await apiService.solveVision(file, get().okeyMeta);
+      const jobResponse = await apiService.solveVision(file, get().okeyMeta);
+
+      // Poll job status
+      const pollJob = async (jobId: string, intervalMs = 1000, timeoutMs = 60000): Promise<any> => {
+        const startTime = Date.now();
+        while (Date.now() - startTime < timeoutMs) {
+          const job = await apiService.getJobStatus(jobId);
+          if (job.status === 'completed') {
+            return job.result;
+          }
+          if (job.status === 'failed') {
+            throw new Error(job.error || 'Job failed processing on the server.');
+          }
+          await new Promise(resolve => setTimeout(resolve, intervalMs));
+        }
+        throw new Error('Processing timed out on the server.');
+      };
+
+      const res = await pollJob(jobResponse.job_id);
+
       if (res.arrangement) {
         set({ solverResult: res.arrangement });
         get().applyArrangement(res.arrangement);
       } else {
         // Place just the tiles on the board
         const newRack = Array(RACK_SIZE).fill(null);
-        res.tiles.forEach((tile, index) => {
+        res.tiles.forEach((tile: any, index: number) => {
           if (index < RACK_SIZE) {
             newRack[index] = tile;
           }
@@ -334,7 +372,7 @@ export const useStore = create<SolverState>((set, get) => ({
       set({ isProcessingVision: false });
       await get().refreshQuota();
     } catch (err: any) {
-      const msg = err.response?.data?.detail || 'Failed to solve hand from image.';
+      const msg = err.response?.data?.detail || err.message || 'Failed to solve hand from image.';
       set({ visionError: msg, isProcessingVision: false });
       throw err;
     }

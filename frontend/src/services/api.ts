@@ -54,6 +54,13 @@ export interface OrchestratorResult {
   arrangement: Arrangement | null;
 }
 
+export interface JobResponse {
+  job_id: string;
+  status: 'processing' | 'completed' | 'failed';
+  result?: any;
+  error?: string;
+}
+
 // Create axios instance
 const api = axios.create({
   baseURL: '/api/v1',
@@ -101,10 +108,10 @@ export const apiService = {
   },
 
   // Vision API
-  async extractTiles(file: File): Promise<ExtractResultCustom> {
+  async extractTiles(file: File): Promise<JobResponse> {
     const formData = new FormData();
     formData.append('file', file);
-    const res = await api.post<ExtractResultCustom>('/vision/extract', formData, {
+    const res = await api.post<JobResponse>('/vision/extract', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -112,18 +119,23 @@ export const apiService = {
     return res.data;
   },
 
-  async solveVision(file: File, okeyMeta: OkeyMeta | null): Promise<OrchestratorResult> {
+  async solveVision(file: File, okeyMeta: OkeyMeta | null): Promise<JobResponse> {
     const formData = new FormData();
     formData.append('file', file);
     if (okeyMeta) {
       formData.append('okey_meta_color', okeyMeta.color);
       formData.append('okey_meta_value', String(okeyMeta.value));
     }
-    const res = await api.post<OrchestratorResult>('/vision/solve', formData, {
+    const res = await api.post<JobResponse>('/vision/solve', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
+    return res.data;
+  },
+
+  async getJobStatus(jobId: string): Promise<JobResponse> {
+    const res = await api.get<JobResponse>(`/vision/jobs/${jobId}`);
     return res.data;
   },
 
