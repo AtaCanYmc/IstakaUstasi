@@ -250,7 +250,7 @@ export const useStore = create<SolverState>((set, get) => ({
   solve: async () => {
     const activeTiles = get().rack.filter((t): t is Tile => t !== null);
     if (activeTiles.length === 0) {
-      set({ solveError: 'Rack is empty! Add tiles before solving.' });
+      set({ solveError: get().t('alertRackEmpty') });
       return;
     }
     set({ isSolving: true, solveError: null });
@@ -259,7 +259,7 @@ export const useStore = create<SolverState>((set, get) => ({
       set({ solverResult: arrangement, isSolving: false });
       get().applyArrangement(arrangement);
     } catch (err: any) {
-      const msg = err.response?.data?.detail || 'Solver error occurred.';
+      const msg = err.response?.data?.detail || get().t('alertSolverError');
       set({ solveError: msg, isSolving: false });
     }
   },
