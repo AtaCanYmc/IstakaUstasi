@@ -1,0 +1,13 @@
+{
+  "packages": {
+    "backend": {
+      "release-type": "python",
+      "package-name": "istaka-ustasi-backend"
+    },
+    "frontend": {
+      "release-type": "node",
+      "package-name": "istaka-ustasi-frontend"
+    }
+  },
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
+}
