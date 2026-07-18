@@ -1,4 +1,29 @@
-.idea/*
-backend/.idea/*
-backend/.env
-supabase/migrations/*
+# IDEs
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Python cache / bytecode
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+**/venv/
+**/.venv/
+ENV/
+
+# Environment configurations
+.env
+**/backend/.env
+
+# Node / Build directories
+**/node_modules/
+**/dist/
+**/dist-ssr/
+*.local
