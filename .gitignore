@@ -1,3 +1,4 @@
 .idea/*
 backend/.idea/*
 backend/.env
+supabase/migrations/*

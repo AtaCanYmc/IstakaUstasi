@@ -33,7 +33,7 @@ async def test_validate_and_sanitize_image_invalid_type():
     with pytest.raises(HTTPException) as excinfo:
         await validate_and_sanitize_image(upload_file)
     assert excinfo.value.status_code == 400
-    assert "not a valid image" in excinfo.value.detail
+    assert "Invalid file signature" in excinfo.value.detail
 
 
 @pytest.mark.asyncio

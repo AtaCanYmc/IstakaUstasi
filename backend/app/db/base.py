@@ -67,3 +67,8 @@ class IDatabaseProvider(ABC):
     def get_system_log_repository(self) -> ISystemLogRepository:
         """Get the system log repository instance"""
         pass
+
+    @abstractmethod
+    async def verify_token(self, token: str) -> dict:
+        """Verify JWT/auth token and return user metadata"""
+        pass

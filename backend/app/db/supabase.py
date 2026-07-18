@@ -105,3 +105,17 @@ class SupabaseDatabaseProvider(IDatabaseProvider):
 
     def get_system_log_repository(self) -> ISystemLogRepository:
         return self.log_repo
+
+    async def verify_token(self, token: str) -> dict:
+        auth_res = self.client.auth.get_user(token)
+        if not auth_res or not auth_res.user:
+            raise ValueError("Invalid auth credentials or token expired")
+
+        user = auth_res.user
+        metadata = getattr(user, "user_metadata", {}) or {}
+        username = (
+            metadata.get("full_name")
+            or metadata.get("name")
+            or metadata.get("user_name")
+        )
+        return {"id": user.id, "email": user.email, "username": username}

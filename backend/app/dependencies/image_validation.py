@@ -9,7 +9,7 @@ MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 async def validate_and_sanitize_image(file: UploadFile = File(...)) -> bytes:
     """
     Validates that the uploaded file is a valid image, enforces a 5MB size limit,
-    and strips any EXIF data / metadata by re-saving the image.
+    verifies binary magic bytes (JPEG, PNG, WEBP), and strips metadata.
     """
     contents = await file.read()
     if len(contents) > MAX_FILE_SIZE:
@@ -18,6 +18,24 @@ async def validate_and_sanitize_image(file: UploadFile = File(...)) -> bytes:
             detail=(
                 f"File is too large ({len(contents)} bytes). "
                 "Max allowed size is 5MB."
+            ),
+        )
+
+    # Magic Bytes / File Signature Validation
+    is_jpeg = contents.startswith(b"\xff\xd8\xff")
+    is_png = contents.startswith(b"\x89PNG\r\n\x1a\n")
+    is_webp = (
+        contents.startswith(b"RIFF")
+        and len(contents) >= 12
+        and contents[8:12] == b"WEBP"
+    )
+
+    if not (is_jpeg or is_png or is_webp):
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Invalid file signature. "
+                "Only JPEG, PNG, and WEBP images are allowed."
             ),
         )
 
