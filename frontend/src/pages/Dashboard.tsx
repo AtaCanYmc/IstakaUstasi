@@ -29,6 +29,7 @@ export const Dashboard: React.FC = () => {
   } = useStore();
 
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isLangOpen, setIsLangOpen] = useState(false);
 
   useEffect(() => {
     initializeAuth();
@@ -54,24 +55,35 @@ export const Dashboard: React.FC = () => {
         {/* Right controls and profile group */}
         <div className="flex items-center gap-1.5 sm:gap-3">
           {/* Controls: Language and Theme */}
-          <div className="relative group">
-            <button className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-btn-sec-bg hover:bg-btn-sec-hover text-btn-sec-text text-[10px] sm:text-xs font-bold transition-all border border-card-border cursor-pointer">
+          <div className="relative">
+            <button
+              onClick={() => setIsLangOpen(!isLangOpen)}
+              className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-btn-sec-bg hover:bg-btn-sec-hover text-btn-sec-text text-[10px] sm:text-xs font-bold transition-all border border-card-border cursor-pointer"
+            >
               <Globe className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
               <span className="uppercase">{language}</span>
             </button>
-            <div className="absolute right-0 mt-1 hidden group-hover:block hover:block bg-card-bg border border-card-border rounded-xl shadow-xl py-1 z-50 min-w-[100px]">
-              {(['tr', 'en', 'fr', 'de'] as const).map((lang) => (
-                <button
-                  key={lang}
-                  onClick={() => setLanguage(lang)}
-                  className={`w-full text-left px-3 py-1.5 text-xs font-semibold hover:bg-bg-secondary cursor-pointer ${
-                    language === lang ? 'text-indigo-600 dark:text-indigo-400' : 'text-text-secondary hover:text-text-primary'
-                  }`}
-                >
-                  {lang === 'tr' ? 'Türkçe' : lang === 'en' ? 'English' : lang === 'fr' ? 'Français' : 'Deutsch'}
-                </button>
-              ))}
-            </div>
+            {isLangOpen && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setIsLangOpen(false)} />
+                <div className="absolute right-0 mt-1 bg-card-bg border border-card-border rounded-xl shadow-xl py-1 z-50 min-w-[100px]">
+                  {(['tr', 'en', 'fr', 'de'] as const).map((lang) => (
+                    <button
+                      key={lang}
+                      onClick={() => {
+                        setLanguage(lang);
+                        setIsLangOpen(false);
+                      }}
+                      className={`w-full text-left px-3 py-1.5 text-xs font-semibold hover:bg-bg-secondary cursor-pointer ${
+                        language === lang ? 'text-indigo-600 dark:text-indigo-400' : 'text-text-secondary hover:text-text-primary'
+                      }`}
+                    >
+                      {lang === 'tr' ? 'Türkçe' : lang === 'en' ? 'English' : lang === 'fr' ? 'Français' : 'Deutsch'}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
 
           <button
