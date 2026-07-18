@@ -1,101 +1,148 @@
 # 🀄 Istaka Ustası (Okey Solver & Vision App)
 
-Istaka Ustası is a full-stack Okey board solver and computer vision application. It helps players scan their physical Okey rack using a camera or select tiles manually, and employs optimization engines to solve the tiles into optimal melds (Runs, Groups, and Doubles) for Okey and 101 Okey games.
-
-## 📂 Project Structure
-
-The project is structured as a monorepo consisting of a FastAPI backend bridge service and a Vite + React + TypeScript frontend:
-
-```text
-IstakaUstasi/
-├── backend/            # FastAPI microservice
-│   ├── app/            # REST endpoints (auth, solver, vision routers)
-│   ├── okey_core/      # Base core logic definitions (Tile, Meld, OkeyMeta types)
-│   ├── okey_solver/    # Solver optimization engines (greedy, backtracking, ILP)
-│   └── okey_vision/    # Roboflow-based computer vision tile recognition
-└── frontend/           # React Single Page App (SPA)
-    ├── src/
-    │   ├── components/ # Rack Board, Tile, Picker Pool, Image Scanner, Auth modals
-    │   ├── services/   # Axios API client routing configurations
-    │   ├── store/      # Zustand state management and auto-layout calculators
-    │   └── pages/      # Dashboard workspace assembly
-    └── package.json
-```
+[![CI/CD Pipeline](https://github.com/AtaCanYmc/IstakaUstasi/actions/workflows/ci.yml/badge.svg)](https://github.com/AtaCanYmc/IstakaUstasi/actions/workflows/ci.yml)
+[![Latest Release](https://img.shields.io/github/v/release/AtaCanYmc/IstakaUstasi?color=blue)](https://github.com/AtaCanYmc/IstakaUstasi/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
+[![Python](https://img.shields.io/badge/Python-3.11-green)](https://www.python.org/)
 
 ---
 
-## ⚡ Quick Start
+## 📝 Executive Summary
 
-### 1. Run with Docker (Recommended)
-You can deploy both the frontend and backend inside a single network using Docker Compose.
+**Istaka Ustası** is a production-grade, full-stack application designed to solve Okey and 101 Okey board arrangements. It utilizes advanced combinatorial optimization engines to calculate the highest scoring tile melds (Runs, Groups, and Doubles) while providing a state-of-the-art computer vision pipeline to extract tile states directly from photos of physical racks.
 
-1. Ensure Docker is running.
-2. In the project root directory, run:
-   ```bash
-   docker compose up --build
-   ```
-3. Access the services:
-   * **Frontend**: Open `http://localhost:3000` in your browser.
-   * **Backend API**: Running at `http://localhost:8000`.
-
-### 2. Manual/Local Setup
-
-#### Run the Backend Service
-The backend requires Python 3.11+ and its dependencies.
-
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
-2. Create and activate a virtual environment:
-   ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate
-   ```
-3. Install the dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Start the FastAPI development server:
-   ```bash
-   uvicorn app.main:app --reload --port 8000
-   ```
-   The backend API will run at `http://localhost:8000`. You can inspect the API swagger documentation at `http://localhost:8000/docs`.
-
-#### Run the Frontend App
-The frontend requires Node.js (v18+) and npm.
-
-1. Open a new terminal and navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
-2. Install package dependencies:
-   ```bash
-   npm install
-   ```
-3. Run the development server:
-   ```bash
-   npm run dev
-   ```
-   The frontend will run at `http://localhost:5173`. Any API calls to `/api/v1/*` are automatically proxied to the backend on port 8000.
-
----
-
-## 🛠 Tech Stack
-
-* **Backend**: FastAPI (Python), PyDantic, Structlog, PuLP (for integer linear programming solving), OpenCV, Roboflow (for computer vision board recognition).
-* **Frontend**: React, TypeScript, Vite, Tailwind CSS v4 (styling), Zustand (state management), `@hello-pangea/dnd` (drag & drop), Lucide React (icons), Axios (API client).
+By pairing a modular React SPA with a highly optimized Python FastAPI solver, Istaka Ustası bridges physical gameplay and optimization mathematics, offering players an automated assistant to analyze and perfect their hands in real time.
 
 ---
 
 ## 🚀 Key Features
 
-1. **Board Optimization (Solver)**:
-   * Supports multiple optimization algorithms: **Backtracking** (exhaustive search), **Greedy** (ultra-fast heuristic), **ILP** (integer linear programming solver), and **Hybrid** approaches.
-   * Melds calculation for Runs (*Seri*), Groups (*Per*), and Doubles (*Çift*).
-2. **AI Computer Vision**:
-   * Drag & drop rack images to extract tile counts, numbers, and colors automatically.
-   * Vision solver combines extraction and arrangement pipelines in a single step.
-3. **Interactive Rack Grid**:
-   * Drag-and-drop enabled rack board representation mirroring actual play shelves.
-   * Auto-organizes solved melds with visible separations between groups.
+- **Combinatorial Solver Engine**: Multi-strategy solvers (Backtracking, Greedy, Integer Linear Programming (ILP), and Hybrid models) to find optimal tile arrangements.
+- **Asynchronous AI Vision Pipeline**: Real-time tile extraction and board arrangement from upload image streams, running on non-blocking background threads with real-time polling.
+- **Secure File Sanitization**: Multi-layer binary signature validation (Magic Bytes) protecting against arbitrary code execution, alongside EXIF metadata stripping and strict size limit enforcement.
+- **Interactive Drag & Drop Board**: Seamlessly mirror your physical rack layout inside the React UI with automatic meld separation.
+- **Extensible Quota Management**: Dedicated quota tracking tables on Supabase database to limit usage and ensure fair resource sharing.
+- **Internationalization**: Full locale support for Turkish (`tr`), English (`en`), French (`fr`), and German (`de`).
+
+---
+
+## 🏗 System Architecture & Tech Stack
+
+### Monorepo Data Flow
+```mermaid
+graph TD
+    User([User]) <--> Frontend[React SPA / Vite]
+    Frontend <--> Nginx[Nginx Reverse Proxy]
+    Nginx <--> Backend[FastAPI Bridge Service]
+    Backend <--> Supabase[Supabase DB & Auth]
+    Backend <--> CV[Roboflow CV Pipeline]
+```
+
+### Technology Matrix
+- **Frontend**: React 19, TypeScript, Zustand (Granular Selective Store State), Tailwind CSS v4, `@hello-pangea/dnd`, Vitest, jsdom.
+- **Backend**: Python 3.11, FastAPI, Pydantic (networks, validation), PIL (Pillow), PuLP (ILP Solver), pytest, pytest-asyncio.
+- **Infrastructural**: Docker & Docker Compose, Nginx, GitHub Actions.
+
+---
+
+## ⚙️ Prerequisites
+
+Ensure you have the following tools installed locally:
+- **Node.js**: `v20.x` or higher
+- **Python**: `3.11.x`
+- **Docker**: `v20.10.x` or higher
+- **Docker Compose**: `v2.x` or higher
+
+---
+
+## 🛠 Setup & Local Development
+
+### 1. Klonlama (Cloning)
+```bash
+git clone https://github.com/AtaCanYmc/IstakaUstasi.git
+cd IstakaUstasi
+```
+
+### 2. Configuration (`.env`)
+Create a `.env` file in the `backend` directory. Refer to [backend/.env.example](file:///Users/atacan/ata-codes/IstakaUstasi/backend/.env.example):
+```env
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_KEY=your-anon-key
+OKEY_RF_KEY=your-roboflow-key
+OKEY_RF_WORKSPACE=your-rf-workspace
+OKEY_RF_WORKFLOW_ID=your-workflow-id
+```
+
+### 3. Docker Deployment (Recommended)
+Launch the entire stack inside container isolated environments with one command:
+```bash
+docker compose up --build
+```
+- **Frontend SPA**: [http://localhost:3000](http://localhost:3000)
+- **FastAPI Backend**: [http://localhost:8000](http://localhost:8000)
+
+### 4. Manual/Local Setup
+
+#### Backend Setup
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000
+```
+
+#### Frontend Setup
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+---
+
+## 🧪 Testing
+
+Both layers maintain testing baselines to ensure code quality:
+
+### Run Backend Tests
+Ensure your python virtual environment is active:
+```bash
+cd backend
+pytest tests/
+```
+
+### Run Frontend Tests
+```bash
+cd frontend
+npm run test
+```
+
+---
+
+## 📖 API Documentation
+
+Once the backend is running, access documentation schemas at:
+- **Swagger UI**: [http://localhost:8000/docs](http://localhost:8000/docs)
+- **ReDoc**: [http://localhost:8000/redoc](http://localhost:8000/redoc)
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please review [CONTRIBUTING.md](file:///Users/atacan/ata-codes/IstakaUstasi/CONTRIBUTING.md) for code styling guidelines, repository standards, and submission protocols.
+
+---
+
+## 🔒 Security
+
+For reporting security vulnerabilities, please refer to [SECURITY.md](file:///Users/atacan/ata-codes/IstakaUstasi/SECURITY.md).
+
+---
+
+## 📄 License & Contact
+
+Distributed under the MIT License. See [LICENSE](file:///Users/atacan/ata-codes/IstakaUstasi/LICENSE) for more information.
+
+Developed by [Ata Can](https://github.com/AtaCanYmc).
