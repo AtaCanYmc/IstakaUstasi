@@ -64,7 +64,8 @@ export const translations = {
     alertSignupFailed: "Kayıt başarısız. Lütfen tekrar deneyin.",
     alertExtractFailed: "Fotoğraftan taşlar çıkarılamadı.",
     alertSolveFailed: "Fotoğraftan el çözülemedi.",
-    alertSolverError: "Çözücü hatası oluştu."
+    alertSolverError: "Çözücü hatası oluştu.",
+    randomHand: "Rastgele El"
   },
   en: {
     title: "Istaka Ustası",
@@ -129,7 +130,8 @@ export const translations = {
     alertSignupFailed: "Signup failed. Please try again.",
     alertExtractFailed: "Failed to extract tiles from image.",
     alertSolveFailed: "Failed to solve hand from image.",
-    alertSolverError: "Solver error occurred."
+    alertSolverError: "Solver error occurred.",
+    randomHand: "Random Hand"
   },
   fr: {
     title: "Istaka Ustası",
@@ -194,7 +196,8 @@ export const translations = {
     alertSignupFailed: "Échec de l'inscription. Veuillez réessayer.",
     alertExtractFailed: "Échec de l'extraction des tuiles de l'image.",
     alertSolveFailed: "Échec de la résolution de la main à partir de l'image.",
-    alertSolverError: "Une erreur de solveur est survenue."
+    alertSolverError: "Une erreur de solveur est survenue.",
+    randomHand: "Main Aléatoire"
   },
   de: {
     title: "Istaka Ustası",
@@ -256,9 +259,10 @@ export const translations = {
     alertJokerIndicator: "Der Indikatorstein kann kein JOKER sein!",
     alertRackEmpty: "Das Rack ist leer! Fügen Sie Steine hinzu, bevor Sie lösen.",
     alertLoginFailed: "Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre Anmeldedaten.",
-    alertSignupFailed: "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    alertSignupFailed: "Registrierung fehlerhaft. Bitte versuchen Sie es erneut.",
     alertExtractFailed: "Steine konnten nicht aus dem Bild extrahiert werden.",
     alertSolveFailed: "Hand konnte nicht aus dem Bild gelöst werden.",
-    alertSolverError: "Ein Löserfehler ist aufgetreten."
+    alertSolverError: "Ein Löserfehler ist aufgetreten.",
+    randomHand: "Zufällige Hand"
   }
 };

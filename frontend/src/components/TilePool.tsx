@@ -8,6 +8,7 @@ export const TilePool: React.FC = () => {
   const okeyMeta = useStore((state) => state.okeyMeta);
   const setOkeyMeta = useStore((state) => state.setOkeyMeta);
   const clearRack = useStore((state) => state.clearRack);
+  const generateRandomHand = useStore((state) => state.generateRandomHand);
   const t = useStore((state) => state.t);
   const [selectedColor, setSelectedColor] = useState<TileColor>('RED');
   const [mode, setMode] = useState<'add' | 'indicator'>('add');
@@ -69,6 +70,12 @@ export const TilePool: React.FC = () => {
             }`}
           >
             {t('setIndicator')}
+          </button>
+          <button
+            onClick={generateRandomHand}
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 dark:border-indigo-900/50 hover:bg-indigo-500/20 transition-all cursor-pointer"
+          >
+            {t('randomHand')}
           </button>
           <button
             onClick={clearRack}

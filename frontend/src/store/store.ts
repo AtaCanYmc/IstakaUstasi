@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import apiService from '../services/api';
-import type { Tile, OkeyMeta, Arrangement, UserProfile } from '../services/api';
+import type { Tile, OkeyMeta, Arrangement, UserProfile, TileColor } from '../services/api';
 import { translations, type Language } from '../i18n/translations';
 
 interface SolverState {
@@ -42,6 +42,7 @@ interface SolverState {
   // Rack actions
   setRack: (rack: (Tile | null)[]) => void;
   clearRack: () => void;
+  generateRandomHand: () => void;
   addTile: (tile: Omit<Tile, 'id'>) => boolean;
   removeTile: (index: number) => void;
   moveTile: (fromIndex: number, toIndex: number) => void;
@@ -195,6 +196,21 @@ export const useStore = create<SolverState>((set, get) => ({
   setRack: (rack) => set({ rack }),
 
   clearRack: () => set({ rack: Array(RACK_SIZE).fill(null), solverResult: null }),
+
+  generateRandomHand: () => {
+    const colors: TileColor[] = ['RED', 'BLACK', 'BLUE', 'YELLOW'];
+    const newRack: (Tile | null)[] = Array(RACK_SIZE).fill(null);
+    for (let i = 0; i < 14; i++) {
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const value = Math.floor(Math.random() * 13) + 1;
+      newRack[i] = {
+        id: `${color.toLowerCase()}_${value}_${Math.random().toString(36).substring(2, 9)}`,
+        color,
+        value,
+      };
+    }
+    set({ rack: newRack, solverResult: null });
+  },
 
   addTile: (tileData) => {
     const rack = [...get().rack];
