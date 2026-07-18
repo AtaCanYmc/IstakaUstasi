@@ -53,7 +53,7 @@ export const Tile: React.FC<TileProps> = ({ tile, isIndicator = false, onClick, 
       {/* Tiny circle indicator at the bottom */}
       {tile.color !== 'JOKER' && (
         <span
-          className={`absolute bottom-2 w-1.5 h-1.5 rounded-full ${
+          className={`hidden sm:block absolute bottom-2 w-1.5 h-1.5 rounded-full ${
             tile.color === 'RED'
               ? 'bg-red-500'
               : tile.color === 'BLACK'
