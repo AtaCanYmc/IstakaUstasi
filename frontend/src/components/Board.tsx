@@ -18,7 +18,7 @@ export const Board: React.FC = () => {
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className={`relative flex items-center justify-center w-12 h-18 sm:w-14 sm:h-20
+            className={`relative flex items-center justify-center w-full h-11 xs:h-13 sm:h-16 lg:w-14 lg:h-20
               rounded-md border border-[var(--rack-slot-border)] bg-[var(--rack-slot-bg)] transition-colors duration-200
               ${snapshot.isDraggingOver ? 'bg-emerald-500/20 border-emerald-500/50' : ''}`}
           >
@@ -29,11 +29,11 @@ export const Board: React.FC = () => {
                     ref={dragProvided.innerRef}
                     {...dragProvided.draggableProps}
                     {...dragProvided.dragHandleProps}
-                    className={`group absolute z-10 transition-transform touch-none ${
+                    className={`group absolute inset-0.5 sm:inset-1 z-10 transition-transform touch-none flex items-center justify-center ${
                       dragSnapshot.isDragging ? 'rotate-3 scale-105 z-50' : ''
                     }`}
                   >
-                    <Tile tile={tile} onRemove={() => removeTile(index)} />
+                    <Tile tile={tile} onRemove={() => removeTile(index)} className="w-full h-full" />
                   </div>
                 )}
               </Draggable>
@@ -73,19 +73,19 @@ export const Board: React.FC = () => {
         <div className="absolute inset-x-0 bottom-0 h-4 bg-gradient-to-r from-[var(--rack-base-from)] via-[var(--rack-base-via)] to-[var(--rack-base-to)] border-t border-[var(--rack-border)]" />
 
         {/* Rack Rows Container */}
-        <div className="flex flex-col gap-6 sm:gap-8 pb-4 overflow-x-auto scrollbar-thin">
+        <div className="flex flex-col gap-6 lg:gap-8 pb-4">
           {/* Row 1 */}
-          <div className="relative min-w-[1000px] lg:min-w-0">
+          <div className="relative">
             {/* Shelf divider shadow line */}
             <div className="absolute inset-x-0 -bottom-3 h-1.5 bg-black/35 dark:bg-black/50 blur-[1px]" />
-            <div className="grid grid-cols-20 gap-1.5 sm:gap-2 justify-center items-center">
+            <div className="grid grid-cols-10 lg:grid-cols-20 gap-1 lg:gap-2 justify-center items-center">
               {row1Slots.map((index) => renderSlot(index))}
             </div>
           </div>
 
           {/* Row 2 */}
-          <div className="relative min-w-[1000px] lg:min-w-0">
-            <div className="grid grid-cols-20 gap-1.5 sm:gap-2 justify-center items-center">
+          <div className="relative">
+            <div className="grid grid-cols-10 lg:grid-cols-20 gap-1 lg:gap-2 justify-center items-center">
               {row2Slots.map((index) => renderSlot(index))}
             </div>
           </div>

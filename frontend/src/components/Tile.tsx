@@ -6,9 +6,10 @@ interface TileProps {
   isIndicator?: boolean;
   onClick?: () => void;
   onRemove?: () => void;
+  className?: string;
 }
 
-export const Tile: React.FC<TileProps> = ({ tile, isIndicator = false, onClick, onRemove }) => {
+export const Tile: React.FC<TileProps> = ({ tile, isIndicator = false, onClick, onRemove, className = '' }) => {
   const getColorStyles = (color: TileColor) => {
     switch (color) {
       case 'RED':
@@ -37,10 +38,11 @@ export const Tile: React.FC<TileProps> = ({ tile, isIndicator = false, onClick, 
     <div
       onClick={onClick}
       className={`relative select-none cursor-pointer flex flex-col items-center justify-center
-        w-11 h-16 sm:w-12 sm:h-18 rounded-lg font-bold text-xl sm:text-2xl shadow-md border-t border-b-4 border-x
+        rounded-lg font-bold text-base xs:text-lg sm:text-xl lg:text-2xl shadow-md border-t border-b-4 border-x
         bg-gradient-to-b from-amber-50 to-amber-100/90 active:scale-95 transition-all
         ${getColorStyles(tile.color)}
-        ${isIndicator ? 'ring-2 ring-emerald-500 ring-offset-2 ring-offset-bg-primary shadow-emerald-500/20' : 'shadow-black/30'}`}
+        ${isIndicator ? 'ring-2 ring-emerald-500 ring-offset-2 ring-offset-bg-primary shadow-emerald-500/20' : 'shadow-black/30'}
+        ${className || 'w-11 h-16 sm:w-12 sm:h-18'}`}
       style={{
         textShadow: '0.5px 0.5px 0px rgba(0, 0, 0, 0.15)',
       }}
