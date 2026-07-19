@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.4.0](https://github.com/AtaCanYmc/IstakaUstasi/compare/istaka-ustasi-backend-v0.3.0...istaka-ustasi-backend-v0.4.0) (2026-07-19)
+
+
+### Features
+
+* add allowOneAfter checkbox to configure circular 12-13-1 runs ([1798d9a](https://github.com/AtaCanYmc/IstakaUstasi/commit/1798d9a302c76b154284984ea07b056ecd72298a))
+* monkeypatch OkeyRuleValidator to support dynamic allow_one_after configuration ([485e97e](https://github.com/AtaCanYmc/IstakaUstasi/commit/485e97ed1e2d9ab5b141acb7f19234e3174db4b0))
+
+
+### Bug Fixes
+
+* monkeypatch InferenceHTTPClient.run_workflow to support both image and images parameter maps ([c256b50](https://github.com/AtaCanYmc/IstakaUstasi/commit/c256b507970af3b6e80ac8aed062ce51479ad151))
+* update OKEY_RF_API_URL in .env.example to point to the correct server ([78f0494](https://github.com/AtaCanYmc/IstakaUstasi/commit/78f049455d07b07f246f9a42749a53a28b1d68c1))
+
 ## [0.3.0](https://github.com/AtaCanYmc/IstakaUstasi/compare/istaka-ustasi-backend-v0.2.0...istaka-ustasi-backend-v0.3.0) (2026-07-18)
 
 
