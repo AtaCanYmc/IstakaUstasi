@@ -65,7 +65,8 @@ export const translations = {
     alertExtractFailed: "Fotoğraftan taşlar çıkarılamadı.",
     alertSolveFailed: "Fotoğraftan el çözülemedi.",
     alertSolverError: "Çözücü hatası oluştu.",
-    randomHand: "Rastgele El"
+    randomHand: "Rastgele El",
+    allowOneAfter: "12-13-1 Dizilimine İzin Ver"
   },
   en: {
     title: "Istaka Ustası",
@@ -131,7 +132,8 @@ export const translations = {
     alertExtractFailed: "Failed to extract tiles from image.",
     alertSolveFailed: "Failed to solve hand from image.",
     alertSolverError: "Solver error occurred.",
-    randomHand: "Random Hand"
+    randomHand: "Random Hand",
+    allowOneAfter: "Allow 12-13-1 run"
   },
   fr: {
     title: "Istaka Ustası",
@@ -197,7 +199,8 @@ export const translations = {
     alertExtractFailed: "Échec de l'extraction des tuiles de l'image.",
     alertSolveFailed: "Échec de la résolution de la main à partir de l'image.",
     alertSolverError: "Une erreur de solveur est survenue.",
-    randomHand: "Main Aléatoire"
+    randomHand: "Main Aléatoire",
+    allowOneAfter: "Autoriser suite 12-13-1"
   },
   de: {
     title: "Istaka Ustası",
@@ -263,6 +266,7 @@ export const translations = {
     alertExtractFailed: "Steine konnten nicht aus dem Bild extrahiert werden.",
     alertSolveFailed: "Hand konnte nicht aus dem Bild gelöst werden.",
     alertSolverError: "Ein Löserfehler ist aufgetreten.",
-    randomHand: "Zufällige Hand"
+    randomHand: "Zufällige Hand",
+    allowOneAfter: "12-13-1 Reihe erlauben"
   }
 };

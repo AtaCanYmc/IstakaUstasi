@@ -15,6 +15,8 @@ export const Dashboard: React.FC = () => {
     logout,
     strategy,
     setStrategy,
+    allowOneAfter,
+    setAllowOneAfter,
     solve,
     clearRack,
     isSolving,
@@ -164,6 +166,15 @@ export const Dashboard: React.FC = () => {
                   </button>
                 ))}
               </div>
+              <label className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-card-border bg-bg-secondary text-xs font-semibold text-text-secondary cursor-pointer hover:text-text-primary transition-colors select-none">
+                <input
+                  type="checkbox"
+                  checked={allowOneAfter}
+                  onChange={(e) => setAllowOneAfter(e.target.checked)}
+                  className="w-3.5 h-3.5 rounded border-card-border text-indigo-600 bg-bg-primary focus:ring-indigo-500 cursor-pointer"
+                />
+                <span>{t('allowOneAfter')}</span>
+              </label>
               <button
                 onClick={clearRack}
                 className="p-2 rounded-lg bg-btn-sec-bg hover:bg-btn-sec-hover text-btn-sec-text border border-card-border hover:text-text-primary cursor-pointer"

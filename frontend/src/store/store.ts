@@ -21,6 +21,7 @@ interface SolverState {
   rack: (Tile | null)[];
   okeyMeta: OkeyMeta | null;
   strategy: 'backtracking' | 'greedy' | 'ilp' | 'hybrid';
+  allowOneAfter: boolean;
   isSolving: boolean;
   solveError: string | null;
   solverResult: Arrangement | null;
@@ -48,6 +49,7 @@ interface SolverState {
   moveTile: (fromIndex: number, toIndex: number) => void;
   setOkeyMeta: (meta: OkeyMeta | null) => void;
   setStrategy: (strategy: 'backtracking' | 'greedy' | 'ilp' | 'hybrid') => void;
+  setAllowOneAfter: (allow: boolean) => void;
 
   // Solver
   solve: () => Promise<void>;
@@ -102,6 +104,7 @@ export const useStore = create<SolverState>((set, get) => ({
   rack: Array(RACK_SIZE).fill(null),
   okeyMeta: null,
   strategy: 'backtracking',
+  allowOneAfter: true,
   isSolving: false,
   solveError: null,
   solverResult: null,
@@ -136,14 +139,15 @@ export const useStore = create<SolverState>((set, get) => ({
     if (token && userStr) {
       try {
         set({ token, user: JSON.parse(userStr) });
-        // Optionally sync user state from DB
+        // Sync user details in background
         apiService.syncUser()
           .then((res) => {
             set({ user: res.profile });
             localStorage.setItem('user', JSON.stringify(res.profile));
           })
           .catch(() => {});
-      } catch (e) {
+      } catch {
+        // Clear corrupt state
         localStorage.removeItem('token');
         localStorage.removeItem('user');
       }
@@ -153,13 +157,15 @@ export const useStore = create<SolverState>((set, get) => ({
   login: async (email, password) => {
     set({ isLoggingIn: true, authError: null });
     try {
-      const data = await apiService.login(email, password);
-      localStorage.setItem('token', data.access_token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      set({ token: data.access_token, user: data.user, isLoggingIn: false });
+      const res = await apiService.login(email, password);
+      localStorage.setItem('token', res.access_token);
+      localStorage.setItem('user', JSON.stringify(res.user));
+      set({ token: res.access_token, user: res.user, isLoggingIn: false });
     } catch (err: any) {
-      const msg = err.response?.data?.detail || 'Login failed. Please check your credentials.';
-      set({ authError: msg, isLoggingIn: false });
+      set({
+        authError: err.response?.data?.detail || 'Login failed. Please check your credentials.',
+        isLoggingIn: false,
+      });
       throw err;
     }
   },
@@ -167,13 +173,15 @@ export const useStore = create<SolverState>((set, get) => ({
   signup: async (email, username, password) => {
     set({ isLoggingIn: true, authError: null });
     try {
-      const data = await apiService.signup(email, username, password);
-      localStorage.setItem('token', data.access_token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      set({ token: data.access_token, user: data.user, isLoggingIn: false });
+      const res = await apiService.signup(email, username, password);
+      localStorage.setItem('token', res.access_token);
+      localStorage.setItem('user', JSON.stringify(res.user));
+      set({ token: res.access_token, user: res.user, isLoggingIn: false });
     } catch (err: any) {
-      const msg = err.response?.data?.detail || 'Signup failed. Please try again.';
-      set({ authError: msg, isLoggingIn: false });
+      set({
+        authError: err.response?.data?.detail || 'Signup failed. Please try again.',
+        isLoggingIn: false,
+      });
       throw err;
     }
   },
@@ -185,12 +193,13 @@ export const useStore = create<SolverState>((set, get) => ({
   },
 
   refreshQuota: async () => {
-    if (!get().token) return;
-    try {
-      const res = await apiService.syncUser();
-      set({ user: res.profile });
-      localStorage.setItem('user', JSON.stringify(res.profile));
-    } catch (err) {}
+    if (get().token) {
+      try {
+        const res = await apiService.syncUser();
+        set({ user: res.profile });
+        localStorage.setItem('user', JSON.stringify(res.profile));
+      } catch {}
+    }
   },
 
   setRack: (rack) => set({ rack }),
@@ -200,29 +209,29 @@ export const useStore = create<SolverState>((set, get) => ({
   generateRandomHand: () => {
     const colors: TileColor[] = ['RED', 'BLACK', 'BLUE', 'YELLOW'];
     const newRack: (Tile | null)[] = Array(RACK_SIZE).fill(null);
+
     for (let i = 0; i < 14; i++) {
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      const value = Math.floor(Math.random() * 13) + 1;
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      const randomVal = Math.floor(Math.random() * 13) + 1;
       newRack[i] = {
-        id: `${color.toLowerCase()}_${value}_${Math.random().toString(36).substring(2, 9)}`,
-        color,
-        value,
+        id: `${randomColor.toLowerCase()}_${randomVal}_${Math.random().toString(36).substring(2, 9)}`,
+        color: randomColor,
+        value: randomVal,
       };
     }
     set({ rack: newRack, solverResult: null });
   },
 
-  addTile: (tileData) => {
+  addTile: (tile) => {
     const rack = [...get().rack];
-    const firstEmptyIndex = rack.findIndex(t => t === null);
-    if (firstEmptyIndex === -1) return false;
-
-    const newTile: Tile = {
-      ...tileData,
-      id: `${tileData.color.toLowerCase()}_${tileData.value}_${Math.random().toString(36).substr(2, 9)}`
+    const emptyIndex = rack.findIndex((t) => t === null);
+    if (emptyIndex === -1) {
+      return false; // Rack is full
+    }
+    rack[emptyIndex] = {
+      ...tile,
+      id: `${tile.color.toLowerCase()}_${tile.value}_${Math.random().toString(36).substr(2, 9)}`,
     };
-
-    rack[firstEmptyIndex] = newTile;
     set({ rack });
     return true;
   },
@@ -247,6 +256,8 @@ export const useStore = create<SolverState>((set, get) => ({
 
   setStrategy: (strategy) => set({ strategy }),
 
+  setAllowOneAfter: (allowOneAfter) => set({ allowOneAfter }),
+
   solve: async () => {
     const activeTiles = get().rack.filter((t): t is Tile => t !== null);
     if (activeTiles.length === 0) {
@@ -255,7 +266,7 @@ export const useStore = create<SolverState>((set, get) => ({
     }
     set({ isSolving: true, solveError: null });
     try {
-      const arrangement = await apiService.arrangeHand(activeTiles, get().okeyMeta, get().strategy);
+      const arrangement = await apiService.arrangeHand(activeTiles, get().okeyMeta, get().strategy, get().allowOneAfter);
       set({ solverResult: arrangement, isSolving: false });
       get().applyArrangement(arrangement);
     } catch (err: any) {

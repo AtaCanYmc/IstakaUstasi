@@ -108,13 +108,19 @@ export const apiService = {
   },
 
   // Solver API
-  async arrangeHand(tiles: Tile[], okeyMeta: OkeyMeta | null, strategy: string = 'backtracking'): Promise<Arrangement> {
-    const cacheKey = `offline_arrange_${JSON.stringify({ tiles, okeyMeta, strategy })}`;
+  async arrangeHand(
+    tiles: Tile[],
+    okeyMeta: OkeyMeta | null,
+    strategy: string = 'backtracking',
+    allowOneAfter: boolean = true
+  ): Promise<Arrangement> {
+    const cacheKey = `offline_arrange_${JSON.stringify({ tiles, okeyMeta, strategy, allowOneAfter })}`;
     try {
       const res = await api.post<Arrangement>('/solver/arrange', {
         tiles,
         okey_meta: okeyMeta,
         strategy,
+        allow_one_after: allowOneAfter,
       });
       localStorage.setItem(cacheKey, JSON.stringify(res.data));
       return res.data;
