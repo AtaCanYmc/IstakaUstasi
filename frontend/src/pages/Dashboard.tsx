@@ -190,6 +190,12 @@ export const Dashboard: React.FC = () => {
           </div>
 
           <Board />
+          {solverResult && (
+            <div className="mt-4 flex items-center justify-between px-5 py-3 rounded-2xl bg-indigo-500/5 border border-indigo-500/10 text-xs shadow-sm max-w-xs ml-auto">
+              <span className="text-text-secondary font-medium">{t('meldsScore')}:</span>
+              <span className="text-sm font-black text-indigo-600 dark:text-indigo-400">{solverResult.totalScore}</span>
+            </div>
+          )}
         </section>
 
         {solveError && (
