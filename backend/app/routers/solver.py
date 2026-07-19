@@ -33,6 +33,10 @@ def arrange_hand(req: ArrangeRequestCustom):
     try:
         logger.info("Solving hand", tiles_count=len(req.tiles), strategy=strategy)
         solver = create_standard_okey_solver(strategy=strategy)
+        if hasattr(solver, "meld_generator") and hasattr(
+            solver.meld_generator, "validator"
+        ):
+            solver.meld_generator.validator.allow_one_after = req.allow_one_after
         return solver.find_best_arrangement(req.tiles, req.okey_meta)
     except ValueError as e:
         logger.warn("Validation error in solver", error=str(e))

@@ -27,6 +27,27 @@ try:
 except ImportError:
     pass
 
+# Monkeypatch OkeyRuleValidator.evaluate_group
+# to support dynamic allow_one_after configuration
+try:
+    from okey_solver.rules import MeldType, OkeyRuleValidator
+
+    original_evaluate_group = OkeyRuleValidator.evaluate_group
+
+    def patched_evaluate_group(self, tiles, okey_meta=None):
+        allow_one = getattr(self, "allow_one_after", True)
+        if self.is_per(tiles, okey_meta):
+            return MeldType.PER
+        if self.is_seri(tiles, allow_one, okey_meta):
+            return MeldType.SERI
+        if len(tiles) == 2 and self.is_tiles_same(tiles[0], tiles[1], okey_meta):
+            return MeldType.CIFT
+        return MeldType.INVALID
+
+    OkeyRuleValidator.evaluate_group = patched_evaluate_group
+except ImportError:
+    pass
+
 from okey_server.settings import OkeyServerSettings
 
 # Import router modules
