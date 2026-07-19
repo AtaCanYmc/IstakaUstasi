@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.2.0](https://github.com/AtaCanYmc/IstakaUstasi/compare/istaka-ustasi-frontend-v1.1.0...istaka-ustasi-frontend-v1.2.0) (2026-07-19)
+
+
+### Features
+
+* add allowOneAfter checkbox to configure circular 12-13-1 runs ([1798d9a](https://github.com/AtaCanYmc/IstakaUstasi/commit/1798d9a302c76b154284984ea07b056ecd72298a))
+* display total melds score directly underneath the board rack ([37706ed](https://github.com/AtaCanYmc/IstakaUstasi/commit/37706ed5a799086f83db72c8c86cf7cb25265a1b))
+
+
+### Bug Fixes
+
+* add selectedFile state to manage file uploads in VisionUpload component ([c0a3f7a](https://github.com/AtaCanYmc/IstakaUstasi/commit/c0a3f7a019dd64f1b197a2ed8c54f85ece5bb6cf))
+* update npm install command to use legacy-peer-deps option ([02a14f9](https://github.com/AtaCanYmc/IstakaUstasi/commit/02a14f9389ac99cd4c21f0a618ab683b15354ae4))
+
 ## [1.1.0](https://github.com/AtaCanYmc/IstakaUstasi/compare/istaka-ustasi-frontend-v1.0.0...istaka-ustasi-frontend-v1.1.0) (2026-07-18)
 
 
