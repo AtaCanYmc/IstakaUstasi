@@ -15,6 +15,7 @@ export const VisionUpload: React.FC = () => {
 
   const [dragActive, setDragActive] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDrag = (e: React.DragEvent) => {
@@ -49,6 +50,7 @@ export const VisionUpload: React.FC = () => {
       alert('Please select an image file (PNG, JPG, JPEG).');
       return;
     }
+    setSelectedFile(file);
     const reader = new FileReader();
     reader.onloadend = () => {
       setPreviewUrl(reader.result as string);
@@ -61,20 +63,19 @@ export const VisionUpload: React.FC = () => {
   };
 
   const handleAction = async (type: 'extract' | 'solve') => {
-    if (!fileInputRef.current?.files?.[0]) return;
-    const file = fileInputRef.current.files[0];
-
+    if (!selectedFile) return;
     try {
       if (type === 'extract') {
-        await uploadImageExtract(file);
+        await uploadImageExtract(selectedFile);
       } else {
-        await uploadImageSolve(file);
+        await uploadImageSolve(selectedFile);
       }
     } catch (err) {}
   };
 
   const clearImage = () => {
     setPreviewUrl(null);
+    setSelectedFile(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
