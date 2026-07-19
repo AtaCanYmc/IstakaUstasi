@@ -7,7 +7,26 @@ from okey_server.logging_config import setup_logging
 from okey_server.otel_config import setup_opentelemetry
 from okey_server.registry import VisionProviderRegistry
 
-# Import state configs and configurations
+# Monkeypatch InferenceHTTPClient.run_workflow to handle both
+# "images" and "image" parameters
+try:
+    from inference_sdk import InferenceHTTPClient
+
+    original_run_workflow = InferenceHTTPClient.run_workflow
+
+    def patched_run_workflow(self, *args, **kwargs):
+        if "images" in kwargs and isinstance(kwargs["images"], dict):
+            images_dict = kwargs["images"]
+            if "images" in images_dict and "image" not in images_dict:
+                images_dict["image"] = images_dict["images"]
+            elif "image" in images_dict and "images" not in images_dict:
+                images_dict["images"] = images_dict["image"]
+        return original_run_workflow(self, *args, **kwargs)
+
+    InferenceHTTPClient.run_workflow = patched_run_workflow
+except ImportError:
+    pass
+
 from okey_server.settings import OkeyServerSettings
 
 # Import router modules
