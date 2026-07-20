@@ -114,3 +114,42 @@ def test_get_job_status_found():
     data = response.json()
     assert data["job_id"] == job_id
     assert data["status"] == "processing"
+
+
+@patch(
+    "app.routers.vision.has_user_custom_key",
+    new_callable=AsyncMock,
+)
+@patch(
+    "okey_orchestrator.VisionSolverEngine.analyze_frame_async",
+    new_callable=AsyncMock,
+)
+@patch(
+    "app.services.user_service.UserService.check_and_update_quota",
+    new_callable=AsyncMock,
+)
+def test_solve_vision_success(mock_quota, mock_analyze, mock_custom_key):
+    mock_quota.return_value = True
+    from okey_core.types import Arrangement
+
+    mock_analyze.return_value = Arrangement(melds=[], remainingTiles=[], totalScore=0)
+    mock_custom_key.return_value = False
+
+    # Create simple valid image bytes
+    img_byte_arr = io.BytesIO()
+    image = Image.new("RGB", (100, 100), color="blue")
+    image.save(img_byte_arr, format="PNG")
+    img_byte_arr.seek(0)
+
+    response = client.post(
+        "/api/v1/vision/solve",
+        data={
+            "strategy": "hybrid",
+            "allow_one_after": "false",
+        },
+        files={"file": ("test.png", img_byte_arr, "image/png")},
+    )
+
+    assert response.status_code == 202
+    data = response.json()
+    assert "job_id" in data

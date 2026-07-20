@@ -183,9 +183,16 @@ export const apiService = {
     return res.data;
   },
 
-  async solveVision(file: File, okeyMeta: OkeyMeta | null): Promise<JobResponse> {
+  async solveVision(
+    file: File,
+    okeyMeta: OkeyMeta | null,
+    strategy: string = 'backtracking',
+    allowOneAfter: boolean = true
+  ): Promise<JobResponse> {
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('strategy', strategy);
+    formData.append('allow_one_after', String(allowOneAfter));
     if (okeyMeta) {
       formData.append('okey_meta_color', okeyMeta.color);
       formData.append('okey_meta_value', String(okeyMeta.value));

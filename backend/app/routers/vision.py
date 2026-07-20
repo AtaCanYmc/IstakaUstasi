@@ -84,12 +84,23 @@ async def run_solve_task(
     pipeline: Any,
     okey_meta: Optional[OkeyMeta],
     user_id: str,
+    allow_one_after: bool = True,
+    strategy: str = "backtracking",
 ):
     from okey_orchestrator import VisionSolverEngine
+    from okey_solver import create_standard_okey_solver
 
     try:
         logger.info("Starting background vision solver", job_id=job_id, user_id=user_id)
-        engine = VisionSolverEngine(pipeline=pipeline, okey_meta=okey_meta)
+        solver = create_standard_okey_solver(strategy=strategy)
+        if hasattr(solver, "meld_generator") and hasattr(
+            solver.meld_generator, "validator"
+        ):
+            solver.meld_generator.validator.allow_one_after = allow_one_after
+
+        engine = VisionSolverEngine(
+            pipeline=pipeline, okey_meta=okey_meta, solver=solver
+        )
         orchestrator_result = await engine.analyze_frame_async(image_content)
 
         if hasattr(orchestrator_result, "model_dump"):
@@ -235,6 +246,8 @@ async def solve_vision(
     background_tasks: BackgroundTasks,
     okey_meta_color: Optional[TileColor] = Form(None),
     okey_meta_value: Optional[int] = Form(None),
+    strategy: str = Form("backtracking"),
+    allow_one_after: bool = Form(True),
     image_content: bytes = Depends(validate_and_sanitize_image),
     pipeline: Any = Depends(get_user_roboflow_provider),
     current_user: dict = Depends(get_current_user),
@@ -266,6 +279,8 @@ async def solve_vision(
         pipeline,
         okey_meta,
         current_user["id"],
+        allow_one_after,
+        strategy,
     )
     return JobStatusResponse(job_id=job_id, status="processing")
 

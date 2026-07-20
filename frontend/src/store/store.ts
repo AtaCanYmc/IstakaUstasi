@@ -411,7 +411,12 @@ export const useStore = create<SolverState>((set, get) => ({
   uploadImageSolve: async (file) => {
     set({ isProcessingVision: true, visionError: null });
     try {
-      const jobResponse = await apiService.solveVision(file, get().okeyMeta);
+      const jobResponse = await apiService.solveVision(
+        file,
+        get().okeyMeta,
+        get().strategy,
+        get().allowOneAfter
+      );
 
       // Poll job status
       const pollJob = async (jobId: string, intervalMs = 1000, timeoutMs = 60000): Promise<any> => {
