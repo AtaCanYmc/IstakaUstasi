@@ -4,19 +4,15 @@ import Board from '../components/Board';
 import TilePool from '../components/TilePool';
 import VisionUpload from '../components/VisionUpload';
 import AuthModal from '../components/AuthModal';
+import SettingsModal from '../components/SettingsModal';
+import Header from '../components/Header';
+import WorkspaceBanner from '../components/WorkspaceBanner';
 import Tile from '../components/Tile';
-import { Play, RotateCcw, LogOut, LogIn, Info, Sparkles, Sun, Moon, Globe, Settings, Trash2, Key } from 'lucide-react';
+import { Play, RotateCcw, Info } from 'lucide-react';
 
 export const Dashboard: React.FC = () => {
   const {
-    user,
-    token,
     initializeAuth,
-    logout,
-    roboflowKeyConfig,
-    saveRoboflowKeyConfig,
-    deleteRoboflowKeyConfig,
-    updateUserProfile,
     strategy,
     setStrategy,
     allowOneAfter,
@@ -28,37 +24,10 @@ export const Dashboard: React.FC = () => {
     solverResult,
     checkHealth,
     t,
-    language,
-    setLanguage,
-    theme,
-    toggleTheme,
   } = useStore();
 
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [isLangOpen, setIsLangOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-
-  const [customUsername, setCustomUsername] = useState('');
-  const [customApiKey, setCustomApiKey] = useState('');
-  const [customWorkspace, setCustomWorkspace] = useState('');
-  const [customWorkflowId, setCustomWorkflowId] = useState('');
-  const [customApiUrl, setCustomApiUrl] = useState('');
-
-  useEffect(() => {
-    if (user) {
-      setCustomUsername(user.username || '');
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (roboflowKeyConfig) {
-      // Don't pre-populate masked values for input changes to avoid saving "xxxx...xxxx" literally
-      setCustomApiKey(roboflowKeyConfig.has_key ? '••••••••••••••••' : '');
-      setCustomWorkspace(roboflowKeyConfig.workspace || '');
-      setCustomWorkflowId(roboflowKeyConfig.workflow_id || '');
-      setCustomApiUrl(roboflowKeyConfig.api_url || '');
-    }
-  }, [roboflowKeyConfig]);
 
   useEffect(() => {
     initializeAuth();
@@ -67,124 +36,14 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-bg-primary pb-20 safe-pb safe-pt safe-pl safe-pr text-text-primary selection:bg-indigo-500 selection:text-white">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-header-bg/85 backdrop-blur-md border-b border-header-border px-4 py-3 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center font-black text-white text-lg sm:text-xl shadow-lg shadow-indigo-500/20">
-            🀄
-          </div>
-          <div>
-            <h1 className="text-sm sm:text-lg font-black tracking-tight text-text-primary">
-              {t('title')}
-            </h1>
-            <p className="hidden sm:block text-[10px] text-indigo-500 dark:text-indigo-400 font-medium">{t('subtitle')}</p>
-          </div>
-        </div>
-
-        {/* Right controls and profile group */}
-        <div className="flex items-center gap-1.5 sm:gap-3">
-          {/* Controls: Language and Theme */}
-          <div className="relative">
-            <button
-              onClick={() => setIsLangOpen(!isLangOpen)}
-              className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-btn-sec-bg hover:bg-btn-sec-hover text-btn-sec-text text-[10px] sm:text-xs font-bold transition-all border border-card-border cursor-pointer"
-            >
-              <Globe className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
-              <span className="uppercase">{language}</span>
-            </button>
-            {isLangOpen && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setIsLangOpen(false)} />
-                <div className="absolute right-0 mt-1 bg-card-bg border border-card-border rounded-xl shadow-xl py-1 z-50 min-w-[100px]">
-                  {(['tr', 'en', 'fr', 'de'] as const).map((lang) => (
-                    <button
-                      key={lang}
-                      onClick={() => {
-                        setLanguage(lang);
-                        setIsLangOpen(false);
-                      }}
-                      className={`w-full text-left px-3 py-1.5 text-xs font-semibold hover:bg-bg-secondary cursor-pointer ${
-                        language === lang ? 'text-indigo-600 dark:text-indigo-400' : 'text-text-secondary hover:text-text-primary'
-                      }`}
-                    >
-                      {lang === 'tr' ? 'Türkçe' : lang === 'en' ? 'English' : lang === 'fr' ? 'Français' : 'Deutsch'}
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-
-          <button
-            onClick={toggleTheme}
-            className="p-1.5 rounded-lg bg-btn-sec-bg hover:bg-btn-sec-hover text-btn-sec-text transition-all border border-card-border cursor-pointer"
-            title={theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-          >
-            {theme === 'dark' ? <Sun className="w-3 sm:w-3.5 h-3 sm:h-3.5" /> : <Moon className="w-3 sm:w-3.5 h-3 sm:h-3.5" />}
-          </button>
-
-          {token && (
-            <button
-              onClick={() => setIsSettingsOpen(true)}
-              className="p-1.5 rounded-lg bg-btn-sec-bg hover:bg-btn-sec-hover text-btn-sec-text transition-all border border-card-border cursor-pointer relative"
-              title={t('roboflowSettings')}
-            >
-              <Settings className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
-              {roboflowKeyConfig?.has_key && (
-                <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-emerald-500 rounded-full" />
-              )}
-            </button>
-          )}
-
-          <div className="h-4 w-px bg-card-border mx-0.5 sm:mx-1" />
-
-          {/* User profile / Login */}
-          <div className="flex items-center gap-2">
-            {token && user ? (
-              <div className="flex items-center gap-2">
-                <div className="hidden sm:block text-right">
-                  <span className="block text-xs font-bold text-text-primary">{user.username}</span>
-                  <span className="block text-[10px] text-text-tertiary">{user.email}</span>
-                </div>
-                <div className="h-7 sm:h-8 w-7 sm:w-8 rounded-lg bg-indigo-950/20 border border-indigo-500/30 flex items-center justify-center font-bold text-[10px] sm:text-xs text-indigo-500 dark:text-indigo-300">
-                  {user.username.slice(0, 2).toUpperCase()}
-                </div>
-                <button
-                  onClick={logout}
-                  className="p-1.5 sm:p-2 rounded-lg bg-btn-sec-bg hover:bg-btn-sec-hover text-btn-sec-text hover:text-rose-500 transition-colors border border-card-border cursor-pointer"
-                  title={t('signOut')}
-                >
-                  <LogOut className="w-3 sm:w-4 h-3 sm:h-4" />
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => setIsAuthOpen(true)}
-                className="p-1.5 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/20 transition-all active:scale-95 cursor-pointer flex items-center justify-center"
-                title={t('signIn')}
-              >
-                <LogIn className="w-3.5 h-3.5 sm:hidden" />
-                <span className="hidden sm:inline">{t('signIn')}</span>
-              </button>
-            )}
-          </div>
-        </div>
-      </header>
+      <Header
+        onOpenAuth={() => setIsAuthOpen(true)}
+        onOpenSettings={() => setIsSettingsOpen(true)}
+      />
 
       {/* Main Workspace */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-8">
-        {/* Banner */}
-        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-indigo-900/10 via-purple-900/5 to-bg-secondary border border-card-border p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
-          <div className="space-y-2">
-            <h2 className="text-lg font-bold text-text-primary flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
-              {t('bannerTitle')}
-            </h2>
-            <p className="text-xs text-text-secondary max-w-2xl">
-              {t('bannerDesc')}
-            </p>
-          </div>
-        </div>
+        <WorkspaceBanner />
 
         {/* Board / Rack section */}
         <section className="space-y-4">
@@ -336,165 +195,7 @@ export const Dashboard: React.FC = () => {
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
 
       {/* Settings Modal */}
-      {isSettingsOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsSettingsOpen(false)} />
-          <div className="relative w-full max-w-md rounded-2xl bg-card-bg border border-card-border p-6 shadow-2xl space-y-6 animate-fade-in text-left">
-            <div>
-              <h3 className="text-lg font-bold text-text-primary flex items-center gap-2">
-                <Key className="w-5 h-5 text-indigo-500" />
-                {t('roboflowSettings')}
-              </h3>
-              <p className="text-xs text-text-secondary mt-1">
-                {t('roboflowSettingsDesc')}
-              </p>
-            </div>
-
-            {/* Profile Settings Section */}
-            <div className="space-y-4 pb-4 border-b border-card-border">
-              <h4 className="text-xs uppercase font-bold tracking-wider text-indigo-500 flex items-center gap-1.5">
-                {t('profileSettings')}
-              </h4>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase font-black text-text-tertiary tracking-wider">{t('email')}</label>
-                  <input
-                    type="text"
-                    value={user?.email || ''}
-                    disabled
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-card-border bg-bg-secondary/50 text-sm text-text-tertiary cursor-not-allowed"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase font-black text-text-tertiary tracking-wider">{t('username')}</label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={customUsername}
-                      onChange={(e) => setCustomUsername(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-card-border bg-bg-secondary text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-text-primary"
-                    />
-                    <button
-                      onClick={async () => {
-                        if (!customUsername.trim()) {
-                          alert('Username cannot be empty');
-                          return;
-                        }
-                        try {
-                          await updateUserProfile(customUsername);
-                          alert(t('profileUpdated'));
-                        } catch {
-                          alert(t('alertProfileUpdateFailed'));
-                        }
-                      }}
-                      className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer"
-                    >
-                      {t('update')}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {roboflowKeyConfig?.has_key && (
-              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                {t('customKeyActive')}
-              </div>
-            )}
-
-            <div className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-[10px] uppercase font-black text-text-tertiary tracking-wider">{t('apiKey')}</label>
-                <input
-                  type="password"
-                  value={customApiKey}
-                  onChange={(e) => setCustomApiKey(e.target.value)}
-                  placeholder="Paste your Roboflow private api key..."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-card-border bg-bg-secondary text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-text-primary"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] uppercase font-black text-text-tertiary tracking-wider">{t('workspace')}</label>
-                <input
-                  type="text"
-                  value={customWorkspace}
-                  onChange={(e) => setCustomWorkspace(e.target.value)}
-                  placeholder="ata-dc7ry"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-card-border bg-bg-secondary text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-text-primary"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] uppercase font-black text-text-tertiary tracking-wider">{t('workflowId')}</label>
-                <input
-                  type="text"
-                  value={customWorkflowId}
-                  onChange={(e) => setCustomWorkflowId(e.target.value)}
-                  placeholder="okey-and-rummikub-vrummikub-p8akb-vr0ef-3-yolov8n-t1-logic"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-card-border bg-bg-secondary text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-text-primary"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] uppercase font-black text-text-tertiary tracking-wider">{t('apiUrl')}</label>
-                <input
-                  type="text"
-                  value={customApiUrl}
-                  onChange={(e) => setCustomApiUrl(e.target.value)}
-                  placeholder="https://serverless.roboflow.com"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-card-border bg-bg-secondary text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-text-primary"
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-3 justify-end border-t border-card-border pt-4">
-              {roboflowKeyConfig?.has_key && (
-                <button
-                  onClick={async () => {
-                    if (confirm('Are you sure you want to remove your custom key configurations?')) {
-                      try {
-                        await deleteRoboflowKeyConfig();
-                        setIsSettingsOpen(false);
-                      } catch {
-                        alert('Failed to remove custom key config');
-                      }
-                    }
-                  }}
-                  className="px-4 py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border border-rose-500/20"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  {t('remove')}
-                </button>
-              )}
-              <button
-                onClick={async () => {
-                  try {
-                    const keyToSend = customApiKey === '••••••••••••••••' ? '' : customApiKey;
-                    if (!roboflowKeyConfig?.has_key && !customApiKey) {
-                      alert('Please enter a valid API Key');
-                      return;
-                    }
-                    await saveRoboflowKeyConfig(
-                      keyToSend,
-                      customWorkspace || undefined,
-                      customWorkflowId || undefined,
-                      customApiUrl || undefined
-                    );
-                    setIsSettingsOpen(false);
-                  } catch {
-                    alert('Failed to save Roboflow key configuration');
-                  }
-                }}
-                className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer shadow-lg shadow-indigo-600/20"
-              >
-                {t('save')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );
 };
