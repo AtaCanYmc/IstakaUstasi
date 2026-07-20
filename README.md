@@ -143,6 +143,6 @@ For reporting security vulnerabilities, please refer to [SECURITY.md](file:///Us
 
 ## 📄 License & Contact
 
-Distributed under the MIT License. See [LICENSE](file:///Users/atacan/ata-codes/IstakaUstasi/LICENSE) for more information.
+Distributed under the Apache 2.0 License. See [LICENSE](file:///Users/atacan/ata-codes/IstakaUstasi/LICENSE) for more information.
 
 Developed by [Ata Can](https://github.com/AtaCanYmc).
