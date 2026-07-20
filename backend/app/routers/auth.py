@@ -2,7 +2,13 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.db import DatabaseFactory
 from app.dependencies.auth import get_current_user
-from app.models.auth import AuthResponse, UserLoginRequest, UserSignupRequest
+from app.models.auth import (
+    AuthResponse,
+    RoboflowKeyResponse,
+    RoboflowKeySaveRequest,
+    UserLoginRequest,
+    UserSignupRequest,
+)
 from app.services.user_service import UserService
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
@@ -112,3 +118,112 @@ async def login(req: UserLoginRequest):
         refresh_token=auth_res.session.refresh_token,
         user=profile,
     )
+
+
+@router.get("/roboflow-key", response_model=RoboflowKeyResponse)
+async def get_roboflow_key(current_user: dict = Depends(get_current_user)):
+    """
+    Retrieves user-defined Roboflow key configuration (API key is masked).
+    """
+    provider = DatabaseFactory.get_provider()
+    client = getattr(provider, "client", None)
+    if not client:
+        raise HTTPException(status_code=500, detail="Database client not configured.")
+
+    try:
+        res = (
+            client.table("user_roboflow_keys")
+            .select("*")
+            .eq("user_id", current_user["id"])
+            .execute()
+        )
+        if not res.data:
+            return RoboflowKeyResponse(has_key=False)
+
+        row = res.data[0]
+        raw_key = row["api_key"]
+        masked = raw_key[:4] + "..." + raw_key[-4:] if len(raw_key) > 8 else "..."
+
+        return RoboflowKeyResponse(
+            has_key=True,
+            api_key_masked=masked,
+            workspace=row.get("workspace"),
+            workflow_id=row.get("workflow_id"),
+            api_url=row.get("api_url"),
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/roboflow-key", response_model=RoboflowKeyResponse)
+async def save_roboflow_key(
+    req: RoboflowKeySaveRequest, current_user: dict = Depends(get_current_user)
+):
+    """
+    Saves or updates user-defined Roboflow credentials.
+    """
+    provider = DatabaseFactory.get_provider()
+    client = getattr(provider, "client", None)
+    if not client:
+        raise HTTPException(status_code=500, detail="Database client not configured.")
+
+    existing_key = None
+    if not req.api_key or req.api_key == "••••••••••••••••":
+        try:
+            res = (
+                client.table("user_roboflow_keys")
+                .select("api_key")
+                .eq("user_id", current_user["id"])
+                .execute()
+            )
+            if res.data:
+                existing_key = res.data[0]["api_key"]
+            else:
+                raise HTTPException(status_code=400, detail="API Key is required.")
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+    active_key = existing_key if existing_key else req.api_key
+    payload = {
+        "user_id": current_user["id"],
+        "api_key": active_key,
+        "workspace": req.workspace,
+        "workflow_id": req.workflow_id,
+        "api_url": req.api_url,
+    }
+
+    try:
+        client.table("user_roboflow_keys").upsert(payload).execute()
+        masked = (
+            active_key[:4] + "..." + active_key[-4:] if len(active_key) > 8 else "..."
+        )
+        return RoboflowKeyResponse(
+            has_key=True,
+            api_key_masked=masked,
+            workspace=req.workspace,
+            workflow_id=req.workflow_id,
+            api_url=req.api_url,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.delete("/roboflow-key")
+async def delete_roboflow_key(current_user: dict = Depends(get_current_user)):
+    """
+    Removes user-defined Roboflow credentials.
+    """
+    provider = DatabaseFactory.get_provider()
+    client = getattr(provider, "client", None)
+    if not client:
+        raise HTTPException(status_code=500, detail="Database client not configured.")
+
+    try:
+        client.table("user_roboflow_keys").delete().eq(
+            "user_id", current_user["id"]
+        ).execute()
+        return {"message": "Roboflow key configuration deleted successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

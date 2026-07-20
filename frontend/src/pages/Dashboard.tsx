@@ -5,7 +5,7 @@ import TilePool from '../components/TilePool';
 import VisionUpload from '../components/VisionUpload';
 import AuthModal from '../components/AuthModal';
 import Tile from '../components/Tile';
-import { Play, RotateCcw, LogOut, LogIn, Info, Sparkles, Sun, Moon, Globe } from 'lucide-react';
+import { Play, RotateCcw, LogOut, LogIn, Info, Sparkles, Sun, Moon, Globe, Settings, Trash2, Key } from 'lucide-react';
 
 export const Dashboard: React.FC = () => {
   const {
@@ -13,6 +13,9 @@ export const Dashboard: React.FC = () => {
     token,
     initializeAuth,
     logout,
+    roboflowKeyConfig,
+    saveRoboflowKeyConfig,
+    deleteRoboflowKeyConfig,
     strategy,
     setStrategy,
     allowOneAfter,
@@ -32,6 +35,22 @@ export const Dashboard: React.FC = () => {
 
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  const [customApiKey, setCustomApiKey] = useState('');
+  const [customWorkspace, setCustomWorkspace] = useState('');
+  const [customWorkflowId, setCustomWorkflowId] = useState('');
+  const [customApiUrl, setCustomApiUrl] = useState('');
+
+  useEffect(() => {
+    if (roboflowKeyConfig) {
+      // Don't pre-populate masked values for input changes to avoid saving "xxxx...xxxx" literally
+      setCustomApiKey(roboflowKeyConfig.has_key ? '••••••••••••••••' : '');
+      setCustomWorkspace(roboflowKeyConfig.workspace || '');
+      setCustomWorkflowId(roboflowKeyConfig.workflow_id || '');
+      setCustomApiUrl(roboflowKeyConfig.api_url || '');
+    }
+  }, [roboflowKeyConfig]);
 
   useEffect(() => {
     initializeAuth();
@@ -95,6 +114,19 @@ export const Dashboard: React.FC = () => {
           >
             {theme === 'dark' ? <Sun className="w-3 sm:w-3.5 h-3 sm:h-3.5" /> : <Moon className="w-3 sm:w-3.5 h-3 sm:h-3.5" />}
           </button>
+
+          {token && (
+            <button
+              onClick={() => setIsSettingsOpen(true)}
+              className="p-1.5 rounded-lg bg-btn-sec-bg hover:bg-btn-sec-hover text-btn-sec-text transition-all border border-card-border cursor-pointer relative"
+              title={t('roboflowSettings')}
+            >
+              <Settings className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
+              {roboflowKeyConfig?.has_key && (
+                <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+              )}
+            </button>
+          )}
 
           <div className="h-4 w-px bg-card-border mx-0.5 sm:mx-1" />
 
@@ -294,6 +326,121 @@ export const Dashboard: React.FC = () => {
 
       {/* Auth Modal */}
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
+
+      {/* Settings Modal */}
+      {isSettingsOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsSettingsOpen(false)} />
+          <div className="relative w-full max-w-md rounded-2xl bg-card-bg border border-card-border p-6 shadow-2xl space-y-6 animate-fade-in text-left">
+            <div>
+              <h3 className="text-lg font-bold text-text-primary flex items-center gap-2">
+                <Key className="w-5 h-5 text-indigo-500" />
+                {t('roboflowSettings')}
+              </h3>
+              <p className="text-xs text-text-secondary mt-1">
+                {t('roboflowSettingsDesc')}
+              </p>
+            </div>
+
+            {roboflowKeyConfig?.has_key && (
+              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                {t('customKeyActive')}
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] uppercase font-black text-text-tertiary tracking-wider">{t('apiKey')}</label>
+                <input
+                  type="password"
+                  value={customApiKey}
+                  onChange={(e) => setCustomApiKey(e.target.value)}
+                  placeholder="Paste your Roboflow private api key..."
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-card-border bg-bg-secondary text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-text-primary"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] uppercase font-black text-text-tertiary tracking-wider">{t('workspace')}</label>
+                <input
+                  type="text"
+                  value={customWorkspace}
+                  onChange={(e) => setCustomWorkspace(e.target.value)}
+                  placeholder="ata-dc7ry"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-card-border bg-bg-secondary text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-text-primary"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] uppercase font-black text-text-tertiary tracking-wider">{t('workflowId')}</label>
+                <input
+                  type="text"
+                  value={customWorkflowId}
+                  onChange={(e) => setCustomWorkflowId(e.target.value)}
+                  placeholder="okey-and-rummikub-vrummikub-p8akb-vr0ef-3-yolov8n-t1-logic"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-card-border bg-bg-secondary text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-text-primary"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] uppercase font-black text-text-tertiary tracking-wider">{t('apiUrl')}</label>
+                <input
+                  type="text"
+                  value={customApiUrl}
+                  onChange={(e) => setCustomApiUrl(e.target.value)}
+                  placeholder="https://serverless.roboflow.com"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-card-border bg-bg-secondary text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-text-primary"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 justify-end border-t border-card-border pt-4">
+              {roboflowKeyConfig?.has_key && (
+                <button
+                  onClick={async () => {
+                    if (confirm('Are you sure you want to remove your custom key configurations?')) {
+                      try {
+                        await deleteRoboflowKeyConfig();
+                        setIsSettingsOpen(false);
+                      } catch {
+                        alert('Failed to remove custom key config');
+                      }
+                    }
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border border-rose-500/20"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  {t('remove')}
+                </button>
+              )}
+              <button
+                onClick={async () => {
+                  try {
+                    const keyToSend = customApiKey === '••••••••••••••••' ? '' : customApiKey;
+                    if (!roboflowKeyConfig?.has_key && !customApiKey) {
+                      alert('Please enter a valid API Key');
+                      return;
+                    }
+                    await saveRoboflowKeyConfig(
+                      keyToSend,
+                      customWorkspace || undefined,
+                      customWorkflowId || undefined,
+                      customApiUrl || undefined
+                    );
+                    setIsSettingsOpen(false);
+                  } catch {
+                    alert('Failed to save Roboflow key configuration');
+                  }
+                }}
+                className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer shadow-lg shadow-indigo-600/20"
+              >
+                {t('save')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

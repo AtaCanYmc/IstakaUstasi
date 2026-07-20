@@ -1,12 +1,21 @@
 from typing import Any, Optional
 
 import structlog
-from fastapi import APIRouter, BackgroundTasks, Depends, Form, HTTPException, status
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    Form,
+    HTTPException,
+    Request,
+    status,
+)
 
 # Import okey types and functions
 from okey_core.types import OkeyMeta, TileColor
 from okey_server.dependencies import get_roboflow_workflow_provider
 
+from app.db import DatabaseFactory
 from app.dependencies.auth import get_current_user
 from app.dependencies.image_validation import validate_and_sanitize_image
 from app.models.vision import ExtractResultCustom, JobStatusResponse
@@ -79,6 +88,64 @@ async def run_solve_task(
         JobService.update_job_failure(job_id, f"Vision/Solver pipeline error: {str(e)}")
 
 
+async def has_user_custom_key(user_id: str) -> bool:
+    provider = DatabaseFactory.get_provider()
+    client = getattr(provider, "client", None)
+    if not client:
+        return False
+    try:
+        res = (
+            client.table("user_roboflow_keys")
+            .select("api_key")
+            .eq("user_id", user_id)
+            .execute()
+        )
+        return len(res.data) > 0
+    except Exception:
+        return False
+
+
+async def get_user_roboflow_provider(
+    request: Request, current_user: dict = Depends(get_current_user)
+) -> Any:
+    provider = DatabaseFactory.get_provider()
+    client = getattr(provider, "client", None)
+    if client:
+        try:
+            res = (
+                client.table("user_roboflow_keys")
+                .select("*")
+                .eq("user_id", current_user["id"])
+                .execute()
+            )
+            if res.data:
+                row = res.data[0]
+                workspace = row.get("workspace") or "ata-dc7ry"
+                workflow_id = (
+                    row.get("workflow_id")
+                    or "okey-and-rummikub-vrummikub-p8akb-vr0ef-3-yolov8n-t1-logic"
+                )
+                api_url = row.get("api_url") or "https://serverless.roboflow.com"
+
+                registry = request.app.state.provider_registry
+                return registry.get_roboflow_workflow_provider(
+                    api_key=row["api_key"],
+                    workspace_name=workspace,
+                    workflow_id=workflow_id,
+                    api_url=api_url,
+                )
+        except Exception as e:
+            logger.warn(
+                "Failed to retrieve custom Roboflow provider, "
+                "falling back to system defaults",
+                user_id=current_user["id"],
+                error=str(e),
+            )
+
+    # Fallback to standard provider
+    return get_roboflow_workflow_provider(request=request)
+
+
 @router.post(
     "/extract",
     response_model=JobStatusResponse,
@@ -87,23 +154,31 @@ async def run_solve_task(
 async def extract_vision(
     background_tasks: BackgroundTasks,
     image_content: bytes = Depends(validate_and_sanitize_image),
-    pipeline: Any = Depends(get_roboflow_workflow_provider),
+    pipeline: Any = Depends(get_user_roboflow_provider),
     current_user: dict = Depends(get_current_user),
 ):
     """
     Triggers detection and extraction of Okey tiles from an image.
     Runs asynchronously and returns a 202 Accepted status with a job ID.
     """
-    # Check/Decrement quota
-    if not await UserService.check_and_update_quota(current_user["id"]):
-        raise HTTPException(
-            status_code=402,
-            detail="Quota exceeded. Weekly quota limits you to 5 image extractions.",
-        )
+    # Check/Decrement quota if user has no custom Roboflow key
+    # (unlimited access for custom keys)
+    if not await has_user_custom_key(current_user["id"]):
+        if not await UserService.check_and_update_quota(current_user["id"]):
+            raise HTTPException(
+                status_code=402,
+                detail=(
+                    "Quota exceeded. Weekly quota limits you to " "5 image extractions."
+                ),
+            )
 
     job_id = JobService.create_job()
     background_tasks.add_task(
-        run_extract_task, job_id, image_content, pipeline, current_user["id"]
+        run_extract_task,
+        job_id,
+        image_content,
+        pipeline,
+        current_user["id"],
     )
     return JobStatusResponse(job_id=job_id, status="processing")
 
@@ -116,19 +191,23 @@ async def solve_vision(
     okey_meta_color: Optional[TileColor] = Form(None),
     okey_meta_value: Optional[int] = Form(None),
     image_content: bytes = Depends(validate_and_sanitize_image),
-    pipeline: Any = Depends(get_roboflow_workflow_provider),
+    pipeline: Any = Depends(get_user_roboflow_provider),
     current_user: dict = Depends(get_current_user),
 ):
     """
     Processes an uploaded board image and directly solves the optimal arrangement.
     Runs asynchronously and returns a 202 Accepted status with a job ID.
     """
-    # Check/Decrement quota
-    if not await UserService.check_and_update_quota(current_user["id"]):
-        raise HTTPException(
-            status_code=402,
-            detail="Quota exceeded. Weekly quota limits you to 5 image extractions.",
-        )
+    # Check/Decrement quota if user has no custom Roboflow key
+    # (unlimited access for custom keys)
+    if not await has_user_custom_key(current_user["id"]):
+        if not await UserService.check_and_update_quota(current_user["id"]):
+            raise HTTPException(
+                status_code=402,
+                detail=(
+                    "Quota exceeded. Weekly quota limits you to " "5 image extractions."
+                ),
+            )
 
     okey_meta = None
     if okey_meta_color and okey_meta_value is not None:

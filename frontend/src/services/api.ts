@@ -38,6 +38,14 @@ export interface UserProfile {
   updated_at: string;
 }
 
+export interface RoboflowKeyResponse {
+  has_key: boolean;
+  api_key_masked?: string | null;
+  workspace?: string | null;
+  workflow_id?: string | null;
+  api_url?: string | null;
+}
+
 export interface AuthResponse {
   access_token: string;
   refresh_token: string;
@@ -105,6 +113,31 @@ export const apiService = {
       }
       throw error;
     }
+  },
+
+  async getRoboflowKey(): Promise<RoboflowKeyResponse> {
+    const res = await api.get<RoboflowKeyResponse>('/auth/roboflow-key');
+    return res.data;
+  },
+
+  async saveRoboflowKey(
+    apiKey: string,
+    workspace?: string,
+    workflowId?: string,
+    apiUrl?: string
+  ): Promise<RoboflowKeyResponse> {
+    const res = await api.post<RoboflowKeyResponse>('/auth/roboflow-key', {
+      api_key: apiKey,
+      workspace: workspace || null,
+      workflow_id: workflowId || null,
+      api_url: apiUrl || null,
+    });
+    return res.data;
+  },
+
+  async deleteRoboflowKey(): Promise<{ message: string }> {
+    const res = await api.delete<{ message: string }>('/auth/roboflow-key');
+    return res.data;
   },
 
   // Solver API

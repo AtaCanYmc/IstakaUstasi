@@ -66,7 +66,18 @@ export const translations = {
     alertSolveFailed: "Fotoğraftan el çözülemedi.",
     alertSolverError: "Çözücü hatası oluştu.",
     randomHand: "Rastgele El",
-    allowOneAfter: "12-13-1 Dizilimine İzin Ver"
+    allowOneAfter: "12-13-1 Dizilimine İzin Ver",
+    roboflowSettings: "Roboflow Ayarları",
+    roboflowSettingsDesc: "Kendi API anahtarınızı tanımlayarak sınırsız görsel tarama yapın.",
+    apiKey: "API Anahtarı",
+    workspace: "Workspace",
+    workflowId: "Workflow ID",
+    apiUrl: "API URL",
+    save: "Kaydet",
+    remove: "Kaldır",
+    statusConfigured: "Aktif",
+    statusNotConfigured: "Devre Dışı",
+    customKeyActive: "Özel anahtar aktif: Sınırsız tarama hakkı."
   },
   en: {
     title: "Istaka Ustası",
@@ -133,7 +144,18 @@ export const translations = {
     alertSolveFailed: "Failed to solve hand from image.",
     alertSolverError: "Solver error occurred.",
     randomHand: "Random Hand",
-    allowOneAfter: "Allow 12-13-1 run"
+    allowOneAfter: "Allow 12-13-1 run",
+    roboflowSettings: "Roboflow Settings",
+    roboflowSettingsDesc: "Define your own API key to get unlimited image scans.",
+    apiKey: "API Key",
+    workspace: "Workspace",
+    workflowId: "Workflow ID",
+    apiUrl: "API URL",
+    save: "Save",
+    remove: "Remove",
+    statusConfigured: "Active",
+    statusNotConfigured: "Disabled",
+    customKeyActive: "Custom key active: Unlimited scans."
   },
   fr: {
     title: "Istaka Ustası",
@@ -200,7 +222,18 @@ export const translations = {
     alertSolveFailed: "Échec de la résolution de la main à partir de l'image.",
     alertSolverError: "Une erreur de solveur est survenue.",
     randomHand: "Main Aléatoire",
-    allowOneAfter: "Autoriser suite 12-13-1"
+    allowOneAfter: "Autoriser suite 12-13-1",
+    roboflowSettings: "Paramètres Roboflow",
+    roboflowSettingsDesc: "Définissez votre propre clé API pour des scans illimités.",
+    apiKey: "Clé API",
+    workspace: "Workspace",
+    workflowId: "Workflow ID",
+    apiUrl: "API URL",
+    save: "Enregistrer",
+    remove: "Supprimer",
+    statusConfigured: "Actif",
+    statusNotConfigured: "Désactivé",
+    customKeyActive: "Clé personnalisée active: Scans illimités."
   },
   de: {
     title: "Istaka Ustası",
@@ -267,6 +300,17 @@ export const translations = {
     alertSolveFailed: "Hand konnte nicht aus dem Bild gelöst werden.",
     alertSolverError: "Ein Löserfehler ist aufgetreten.",
     randomHand: "Zufällige Hand",
-    allowOneAfter: "12-13-1 Reihe erlauben"
+    allowOneAfter: "12-13-1 Reihe erlauben",
+    roboflowSettings: "Roboflow Einstellungen",
+    roboflowSettingsDesc: "Definieren Sie Ihren eigenen API-Schlüssel für unbegrenzte Scans.",
+    apiKey: "API-Schlüssel",
+    workspace: "Workspace",
+    workflowId: "Workflow ID",
+    apiUrl: "API URL",
+    save: "Speichern",
+    remove: "Entfernen",
+    statusConfigured: "Aktiv",
+    statusNotConfigured: "Deaktiviert",
+    customKeyActive: "Eigener Schlüssel aktiv: Unbegrenzte Scans."
   }
 };

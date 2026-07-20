@@ -3,11 +3,11 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
-from okey_server.dependencies import get_roboflow_workflow_provider
 from PIL import Image
 
 from app.dependencies.auth import get_current_user
 from app.main import app
+from app.routers.vision import get_user_roboflow_provider
 from app.services.job_service import JobService
 
 client = TestClient(app)
@@ -24,7 +24,7 @@ async def override_get_roboflow_workflow_provider():
 @pytest.fixture(autouse=True)
 def setup_overrides():
     app.dependency_overrides[get_current_user] = override_get_current_user
-    app.dependency_overrides[get_roboflow_workflow_provider] = (
+    app.dependency_overrides[get_user_roboflow_provider] = (
         override_get_roboflow_workflow_provider
     )
     JobService._jobs.clear()
@@ -33,6 +33,10 @@ def setup_overrides():
 
 
 @patch(
+    "app.routers.vision.has_user_custom_key",
+    new_callable=AsyncMock,
+)
+@patch(
     "okey_vision.VisionEngine.process_frame_async",
     new_callable=AsyncMock,
 )
@@ -40,9 +44,10 @@ def setup_overrides():
     "app.services.user_service.UserService.check_and_update_quota",
     new_callable=AsyncMock,
 )
-def test_extract_vision_success(mock_quota, mock_process):
+def test_extract_vision_success(mock_quota, mock_process, mock_custom_key):
     mock_quota.return_value = True
     mock_process.return_value = []
+    mock_custom_key.return_value = False
 
     # Create simple valid image bytes
     img_byte_arr = io.BytesIO()
@@ -70,11 +75,16 @@ def test_extract_vision_success(mock_quota, mock_process):
 
 
 @patch(
+    "app.routers.vision.has_user_custom_key",
+    new_callable=AsyncMock,
+)
+@patch(
     "app.services.user_service.UserService.check_and_update_quota",
     new_callable=AsyncMock,
 )
-def test_extract_vision_quota_exceeded(mock_quota):
+def test_extract_vision_quota_exceeded(mock_quota, mock_custom_key):
     mock_quota.return_value = False
+    mock_custom_key.return_value = False
 
     # Create simple valid image bytes
     img_byte_arr = io.BytesIO()

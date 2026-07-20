@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import apiService from '../services/api';
-import type { Tile, OkeyMeta, Arrangement, UserProfile, TileColor } from '../services/api';
+import type { Tile, OkeyMeta, Arrangement, UserProfile, TileColor, RoboflowKeyResponse } from '../services/api';
 import { translations, type Language } from '../i18n/translations';
 
 interface SolverState {
@@ -16,6 +16,12 @@ interface SolverState {
   token: string | null;
   isLoggingIn: boolean;
   authError: string | null;
+
+  // Roboflow Key Config
+  roboflowKeyConfig: RoboflowKeyResponse | null;
+  fetchRoboflowKeyConfig: () => Promise<void>;
+  saveRoboflowKeyConfig: (key: string, workspace?: string, workflowId?: string, apiUrl?: string) => Promise<void>;
+  deleteRoboflowKeyConfig: () => Promise<void>;
 
   // Rack Grid (2 rows of 20 slots = 40 slots)
   rack: (Tile | null)[];
@@ -101,6 +107,34 @@ export const useStore = create<SolverState>((set, get) => ({
   isLoggingIn: false,
   authError: null,
 
+  roboflowKeyConfig: null,
+
+  fetchRoboflowKeyConfig: async () => {
+    if (!get().token) return;
+    try {
+      const config = await apiService.getRoboflowKey();
+      set({ roboflowKeyConfig: config });
+    } catch {}
+  },
+
+  saveRoboflowKeyConfig: async (key, workspace, workflowId, apiUrl) => {
+    try {
+      const config = await apiService.saveRoboflowKey(key, workspace, workflowId, apiUrl);
+      set({ roboflowKeyConfig: config });
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  deleteRoboflowKeyConfig: async () => {
+    try {
+      await apiService.deleteRoboflowKey();
+      set({ roboflowKeyConfig: { has_key: false } });
+    } catch (err) {
+      throw err;
+    }
+  },
+
   rack: Array(RACK_SIZE).fill(null),
   okeyMeta: null,
   strategy: 'backtracking',
@@ -139,6 +173,7 @@ export const useStore = create<SolverState>((set, get) => ({
     if (token && userStr) {
       try {
         set({ token, user: JSON.parse(userStr) });
+        get().fetchRoboflowKeyConfig();
         // Sync user details in background
         apiService.syncUser()
           .then((res) => {
@@ -161,6 +196,7 @@ export const useStore = create<SolverState>((set, get) => ({
       localStorage.setItem('token', res.access_token);
       localStorage.setItem('user', JSON.stringify(res.user));
       set({ token: res.access_token, user: res.user, isLoggingIn: false });
+      get().fetchRoboflowKeyConfig();
     } catch (err: any) {
       set({
         authError: err.response?.data?.detail || 'Login failed. Please check your credentials.',
@@ -177,6 +213,7 @@ export const useStore = create<SolverState>((set, get) => ({
       localStorage.setItem('token', res.access_token);
       localStorage.setItem('user', JSON.stringify(res.user));
       set({ token: res.access_token, user: res.user, isLoggingIn: false });
+      get().fetchRoboflowKeyConfig();
     } catch (err: any) {
       set({
         authError: err.response?.data?.detail || 'Signup failed. Please try again.',
@@ -189,7 +226,7 @@ export const useStore = create<SolverState>((set, get) => ({
   logout: () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    set({ token: null, user: null });
+    set({ token: null, user: null, roboflowKeyConfig: null });
   },
 
   refreshQuota: async () => {
