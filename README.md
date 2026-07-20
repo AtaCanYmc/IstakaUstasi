@@ -2,7 +2,7 @@
 
 [![CI/CD Pipeline](https://github.com/AtaCanYmc/IstakaUstasi/actions/workflows/ci.yml/badge.svg)](https://github.com/AtaCanYmc/IstakaUstasi/actions/workflows/ci.yml)
 [![Latest Release](https://img.shields.io/github/v/release/AtaCanYmc/IstakaUstasi?color=blue)](https://github.com/AtaCanYmc/IstakaUstasi/releases)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
 [![Python](https://img.shields.io/badge/Python-3.11-green)](https://www.python.org/)
 
