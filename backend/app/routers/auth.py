@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from app.db import DatabaseFactory, UserProfile
 from app.dependencies.auth import get_current_user
@@ -12,6 +12,7 @@ from app.models.auth import (
 )
 from app.services.encryption import EncryptionService
 from app.services.user_service import UserService
+from app.utils.i18n import get_message
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -31,7 +32,7 @@ async def sync_user(current_user: dict = Depends(get_current_user)):
 
 
 @router.post("/signup", response_model=AuthResponse)
-async def signup(req: UserSignupRequest):
+async def signup(req: UserSignupRequest, request: Request):
     """
     Signs up a new user via Supabase Auth and registers them in the database.
     """
@@ -39,7 +40,7 @@ async def signup(req: UserSignupRequest):
     client = getattr(provider, "client", None)
     if not client:
         raise HTTPException(
-            status_code=500, detail="Database client provider not configured."
+            status_code=500, detail=get_message(request, "db_not_configured")
         )
 
     try:
@@ -51,7 +52,10 @@ async def signup(req: UserSignupRequest):
             }
         )
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        err_msg = str(e)
+        if "already exists" in err_msg.lower():
+            err_msg = get_message(request, "username_taken")
+        raise HTTPException(status_code=400, detail=err_msg)
 
     # Synchronize custom user profile data
     profile = await UserService.sync_user_profile(
@@ -82,7 +86,7 @@ async def signup(req: UserSignupRequest):
 
 
 @router.post("/login", response_model=AuthResponse)
-async def login(req: UserLoginRequest):
+async def login(req: UserLoginRequest, request: Request):
     """
     Logs in an existing user using email/password.
     """
@@ -90,7 +94,7 @@ async def login(req: UserLoginRequest):
     client = getattr(provider, "client", None)
     if not client:
         raise HTTPException(
-            status_code=500, detail="Database client provider not configured."
+            status_code=500, detail=get_message(request, "db_not_configured")
         )
 
     try:
@@ -98,7 +102,14 @@ async def login(req: UserLoginRequest):
             {"email": req.email, "password": req.password}
         )
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Authentication failed: {str(e)}")
+        err_msg = str(e)
+        if (
+            "invalid" in err_msg.lower()
+            or "credentials" in err_msg.lower()
+            or "not found" in err_msg.lower()
+        ):
+            err_msg = get_message(request, "invalid_credentials")
+        raise HTTPException(status_code=400, detail=err_msg)
 
     # Ensure profile records exist in public schema
     user_repo = provider.get_user_repository()
@@ -120,14 +131,18 @@ async def login(req: UserLoginRequest):
 
 
 @router.get("/roboflow-key", response_model=RoboflowKeyResponse)
-async def get_roboflow_key(current_user: dict = Depends(get_current_user)):
+async def get_roboflow_key(
+    request: Request, current_user: dict = Depends(get_current_user)
+):
     """
     Retrieves user-defined Roboflow key configuration (API key is masked).
     """
     provider = DatabaseFactory.get_provider()
     client = getattr(provider, "client", None)
     if not client:
-        raise HTTPException(status_code=500, detail="Database client not configured.")
+        raise HTTPException(
+            status_code=500, detail=get_message(request, "db_not_configured")
+        )
 
     try:
         res = (
@@ -165,7 +180,9 @@ async def get_roboflow_key(current_user: dict = Depends(get_current_user)):
 
 @router.post("/roboflow-key", response_model=RoboflowKeyResponse)
 async def save_roboflow_key(
-    req: RoboflowKeySaveRequest, current_user: dict = Depends(get_current_user)
+    req: RoboflowKeySaveRequest,
+    request: Request,
+    current_user: dict = Depends(get_current_user),
 ):
     """
     Saves or updates user-defined Roboflow credentials.
@@ -173,7 +190,9 @@ async def save_roboflow_key(
     provider = DatabaseFactory.get_provider()
     client = getattr(provider, "client", None)
     if not client:
-        raise HTTPException(status_code=500, detail="Database client not configured.")
+        raise HTTPException(
+            status_code=500, detail=get_message(request, "db_not_configured")
+        )
 
     encrypted_key = None
     decrypted_key = ""
@@ -192,7 +211,9 @@ async def save_roboflow_key(
                 except Exception:
                     decrypted_key = ""
             else:
-                raise HTTPException(status_code=400, detail="API Key is required.")
+                raise HTTPException(
+                    status_code=400, detail=get_message(request, "key_required")
+                )
         except HTTPException:
             raise
         except Exception as e:
@@ -228,14 +249,18 @@ async def save_roboflow_key(
 
 
 @router.delete("/roboflow-key")
-async def delete_roboflow_key(current_user: dict = Depends(get_current_user)):
+async def delete_roboflow_key(
+    request: Request, current_user: dict = Depends(get_current_user)
+):
     """
     Removes user-defined Roboflow credentials.
     """
     provider = DatabaseFactory.get_provider()
     client = getattr(provider, "client", None)
     if not client:
-        raise HTTPException(status_code=500, detail="Database client not configured.")
+        raise HTTPException(
+            status_code=500, detail=get_message(request, "db_not_configured")
+        )
 
     try:
         client.table("user_roboflow_keys").delete().eq(

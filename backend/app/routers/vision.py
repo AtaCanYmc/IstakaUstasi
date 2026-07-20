@@ -21,12 +21,13 @@ from app.models.vision import ExtractResultCustom, JobStatusResponse
 from app.services.encryption import EncryptionService
 from app.services.job_service import JobService
 from app.services.user_service import UserService
+from app.utils.i18n import get_language, get_message
 
 logger = structlog.get_logger("okey_bridge_server.routers.vision")
 router = APIRouter(prefix="/vision", tags=["Vision"])
 
 
-def parse_roboflow_error(error_msg: str) -> str:
+def parse_roboflow_error(error_msg: str, lang: str = "en") -> str:
     err_lower = error_msg.lower()
     if (
         "403" in error_msg
@@ -34,19 +35,31 @@ def parse_roboflow_error(error_msg: str) -> str:
         or "forbidden" in err_lower
         or "unauthorised" in err_lower
     ):
-        return "API anahtarınız hatalı, lütfen kontrol edin."
+        return (
+            "API anahtarınız hatalı, lütfen kontrol edin."
+            if lang == "tr"
+            else "Your API key is incorrect, please check."
+        )
     if (
         "429" in error_msg
         or "quota" in err_lower
         or "limit" in err_lower
         or "too many requests" in err_lower
     ):
-        return "Roboflow limitsiz kullanım kotanız doldu veya limit aşıldı."
-    return f"Roboflow hatası: {error_msg}"
+        return (
+            "Roboflow limitsiz kullanım kotanız doldu veya limit aşıldı."
+            if lang == "tr"
+            else "Roboflow unlimited quota has been reached or rate limited."
+        )
+    return (
+        f"Roboflow hatası: {error_msg}"
+        if lang == "tr"
+        else f"Roboflow error: {error_msg}"
+    )
 
 
 async def run_extract_task(
-    job_id: str, image_content: bytes, pipeline: Any, user_id: str
+    job_id: str, image_content: bytes, pipeline: Any, user_id: str, lang: str = "en"
 ):
     from okey_vision import VisionEngine
 
@@ -74,7 +87,7 @@ async def run_extract_task(
         logger.exception(
             "Background tile extraction failed", job_id=job_id, error=str(e)
         )
-        error_detail = parse_roboflow_error(str(e))
+        error_detail = parse_roboflow_error(str(e), lang)
         JobService.update_job_failure(job_id, error_detail)
 
 
@@ -86,6 +99,7 @@ async def run_solve_task(
     user_id: str,
     allow_one_after: bool = True,
     strategy: str = "backtracking",
+    lang: str = "en",
 ):
     from okey_orchestrator import VisionSolverEngine
     from okey_solver import create_standard_okey_solver
@@ -116,7 +130,7 @@ async def run_solve_task(
         )
     except Exception as e:
         logger.exception("Background vision solver failed", job_id=job_id, error=str(e))
-        error_detail = parse_roboflow_error(str(e))
+        error_detail = parse_roboflow_error(str(e), lang)
         JobService.update_job_failure(job_id, error_detail)
 
 
@@ -144,7 +158,7 @@ async def get_user_roboflow_provider(
     client = getattr(provider, "client", None)
     if not client:
         raise HTTPException(
-            status_code=500, detail="Database provider client not configured."
+            status_code=500, detail=get_message(request, "db_not_configured")
         )
 
     try:
@@ -161,16 +175,13 @@ async def get_user_roboflow_provider(
             error=str(e),
         )
         raise HTTPException(
-            status_code=500, detail="Internal server database connection error."
+            status_code=500, detail=get_message(request, "db_not_configured")
         )
 
     if not res.data:
         raise HTTPException(
             status_code=400,
-            detail=(
-                "Roboflow API key is required to use vision tasks. "
-                "Please configure your custom API key in the settings."
-            ),
+            detail=get_message(request, "no_custom_key"),
         )
 
     row = res.data[0]
@@ -190,7 +201,7 @@ async def get_user_roboflow_provider(
             error=str(e),
         )
         raise HTTPException(
-            status_code=500, detail="Error decrypting your custom API key."
+            status_code=500, detail=get_message(request, "decryption_error")
         )
 
     registry = request.app.state.provider_registry
@@ -209,6 +220,7 @@ async def get_user_roboflow_provider(
 )
 async def extract_vision(
     background_tasks: BackgroundTasks,
+    request: Request,
     image_content: bytes = Depends(validate_and_sanitize_image),
     pipeline: Any = Depends(get_user_roboflow_provider),
     current_user: dict = Depends(get_current_user),
@@ -223,9 +235,7 @@ async def extract_vision(
         if not await UserService.check_and_update_quota(current_user["id"]):
             raise HTTPException(
                 status_code=402,
-                detail=(
-                    "Quota exceeded. Weekly quota limits you to " "3 image extractions."
-                ),
+                detail=get_message(request, "quota_exceeded"),
             )
 
     job_id = JobService.create_job()
@@ -235,6 +245,7 @@ async def extract_vision(
         image_content,
         pipeline,
         current_user["id"],
+        get_language(request),
     )
     return JobStatusResponse(job_id=job_id, status="processing")
 
@@ -244,6 +255,7 @@ async def extract_vision(
 )
 async def solve_vision(
     background_tasks: BackgroundTasks,
+    request: Request,
     okey_meta_color: Optional[TileColor] = Form(None),
     okey_meta_value: Optional[int] = Form(None),
     strategy: str = Form("backtracking"),
@@ -262,9 +274,7 @@ async def solve_vision(
         if not await UserService.check_and_update_quota(current_user["id"]):
             raise HTTPException(
                 status_code=402,
-                detail=(
-                    "Quota exceeded. Weekly quota limits you to " "3 image extractions."
-                ),
+                detail=get_message(request, "quota_exceeded"),
             )
 
     okey_meta = None
@@ -281,19 +291,25 @@ async def solve_vision(
         current_user["id"],
         allow_one_after,
         strategy,
+        get_language(request),
     )
     return JobStatusResponse(job_id=job_id, status="processing")
 
 
 @router.get("/jobs/{job_id}", response_model=JobStatusResponse)
-async def get_job_status(job_id: str, current_user: dict = Depends(get_current_user)):
+async def get_job_status(
+    job_id: str,
+    request: Request,
+    current_user: dict = Depends(get_current_user),
+):
     """
     Retrieves the status of a specific background job by ID.
     """
     job = JobService.get_job(job_id)
     if not job:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Job not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=get_message(request, "job_not_found"),
         )
     return JobStatusResponse(
         job_id=job_id,

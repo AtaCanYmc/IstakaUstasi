@@ -82,6 +82,11 @@ api.interceptors.request.use((config) => {
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  const lang = localStorage.getItem('language') || document.documentElement.lang || 'tr';
+  if (config.headers) {
+    config.headers['X-Language'] = lang;
+    config.headers['Accept-Language'] = lang;
+  }
   return config;
 }, (error) => {
   return Promise.reject(error);
