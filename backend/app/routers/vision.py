@@ -26,6 +26,25 @@ logger = structlog.get_logger("okey_bridge_server.routers.vision")
 router = APIRouter(prefix="/vision", tags=["Vision"])
 
 
+def parse_roboflow_error(error_msg: str) -> str:
+    err_lower = error_msg.lower()
+    if (
+        "403" in error_msg
+        or "unauthorized" in err_lower
+        or "forbidden" in err_lower
+        or "unauthorised" in err_lower
+    ):
+        return "API anahtarınız hatalı, lütfen kontrol edin."
+    if (
+        "429" in error_msg
+        or "quota" in err_lower
+        or "limit" in err_lower
+        or "too many requests" in err_lower
+    ):
+        return "Roboflow limitsiz kullanım kotanız doldu veya limit aşıldı."
+    return f"Roboflow hatası: {error_msg}"
+
+
 async def run_extract_task(
     job_id: str, image_content: bytes, pipeline: Any, user_id: str
 ):
@@ -55,7 +74,8 @@ async def run_extract_task(
         logger.exception(
             "Background tile extraction failed", job_id=job_id, error=str(e)
         )
-        JobService.update_job_failure(job_id, f"Vision provider error: {str(e)}")
+        error_detail = parse_roboflow_error(str(e))
+        JobService.update_job_failure(job_id, error_detail)
 
 
 async def run_solve_task(
@@ -85,7 +105,8 @@ async def run_solve_task(
         )
     except Exception as e:
         logger.exception("Background vision solver failed", job_id=job_id, error=str(e))
-        JobService.update_job_failure(job_id, f"Vision/Solver pipeline error: {str(e)}")
+        error_detail = parse_roboflow_error(str(e))
+        JobService.update_job_failure(job_id, error_detail)
 
 
 async def has_user_custom_key(user_id: str) -> bool:
