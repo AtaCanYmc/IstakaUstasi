@@ -1,50 +1,50 @@
-# Roboflow API Key ve Görsel Çözümleme Kurulum Rehberi
+# Roboflow API Key and Vision Analysis Setup Guide
 
-Bu rehber, Istaka Ustası uygulamasının görsel tarama (fotoğraftan taşları algılama) özelliğini kendi Roboflow hesabınız ve API anahtarınız ile nasıl çalıştıracağınızı adım adım açıklamaktadır.
-
----
-
-## Neden Kendi API Anahtarımı Kullanmalıyım?
-Istaka Ustası, güvenliğiniz ve sınırsız kullanımınız için **BYOK (Bring Your Own Key)** altyapısını destekler. API anahtarınız sunucu tarafında AES-256 algoritmasıyla güçlü bir şekilde şifrelenir ve asla ham haliyle saklanmaz. Kendi Roboflow anahtarınızı girerek ücretsiz plandaki kotalara takılmadan sınırsız görsel analiz gerçekleştirebilirsiniz.
+This document describes step-by-step how to configure and run the visual scanning (detecting tiles from images) feature of the Istaka Ustası application using your own Roboflow account and API key.
 
 ---
 
-## Adım Adım Roboflow Kurulumu
-
-### Adım 1: Roboflow Hesabı Oluşturma
-1. [Roboflow web sitesine](https://roboflow.com/) gidin.
-2. Ücretsiz bir hesap oluşturun veya mevcut hesabınızla giriş yapın.
-
-### Adım 2: API Anahtarını Alma
-1. Sağ üst köşedeki profil ikonunuza tıklayın ve **"Settings" (Ayarlar)** seçeneğine gidin.
-2. Sol menüden **"Workspaces"** sekmesinden çalışma alanınızı seçin.
-3. Menüdeki **"API Keys"** seçeneğine tıklayın.
-4. **"Private API Key"** başlığı altındaki gizli anahtarı kopyalayın (Örn: `rf_xxxxxxxxxxxxxxxxxxxxxxxx`).
-   * *Not: Bu anahtarı kimseyle paylaşmayın.*
-
-### Adım 3: Workspace Adını Öğrenme
-1. Roboflow paneline (Dashboard) gidin.
-2. Tarayıcı adres çubuğundaki URL'den veya Workspace ayarlarından workspace adını bulun.
-   * Örneğin: `https://app.roboflow.com/ata-dc7ry/...` adresindeki `ata-dc7ry` sizin **Workspace** adınızdır.
-
-### Adım 4: İş Akışı (Workflow) Oluşturma veya Tanımlama
-Istaka Ustası, görselleri analiz etmek için Roboflow'un **Workflows** altyapısını kullanır.
-1. Roboflow Workspace'inizde sol menüden **"Workflows"** sekmesine gidin.
-2. Yeni bir iş akışı oluşturun veya projenizde tanımlı olan YOLOv8 tabanlı taş algılama modelini iş akışına bağlayın.
-3. İş akışınızın benzersiz kimliğini (**Workflow ID**) kopyalayın.
-   * Örneğin: `okey-and-rummikub-vrummikub-p8akb-vr0ef-3-yolov8n-t1-logic` gibi bir isim olacaktır.
+## Why Should I Use My Own API Key?
+Istaka Ustası supports a **BYOK (Bring Your Own Key)** infrastructure for your security and unlimited use. Your API key is strongly encrypted on the server side using the AES-256 algorithm and is never stored in plain text. By entering your own Roboflow credentials, you can perform unlimited image analyses without hitting the free-tier system quotas.
 
 ---
 
-## Istaka Ustası Arayüzünde Yapılandırma
+## Step-by-Step Roboflow Setup
 
-Kopyaladığınız bilgileri Istaka Ustası uygulamasına girmek için:
-1. Uygulamada **Ayarlar** (profil) butonuna tıklayın.
-2. Açılan panelde şu bilgileri doldurun:
-   - **API Anahtarı (API Key):** Kopyaladığınız `rf_...` ile başlayan anahtar.
-   - **Workspace:** Workspace adınız (örn: `ata-dc7ry`).
-   - **Workflow ID:** İş akışı kimliğiniz.
-   - **API URL:** Varsayılan olarak `https://serverless.roboflow.com` bırakabilirsiniz.
-3. **Kaydet** butonuna tıklayın.
+### Step 1: Create a Roboflow Account
+1. Go to the [Roboflow Website](https://roboflow.com/).
+2. Create a free developer account or log in if you already have one.
 
-Bilgileriniz kaydedildikten sonra sistem görsel tarama işlemlerini doğrudan kendi hesabınız üzerinden yapacaktır.
+### Step 2: Get Your Private API Key
+1. Click on your profile icon in the top-right corner and select **"Settings"**.
+2. Select your workspace under the **"Workspaces"** tab on the left menu.
+3. Click on the **"API Keys"** option.
+4. Copy the secret key under the **"Private API Key"** heading (e.g., `rf_xxxxxxxxxxxxxxxxxxxxxxxx`).
+   * *Note: Keep this key secure. Do not share it with anyone.*
+
+### Step 3: Get Your Workspace Name
+1. Navigate to your Roboflow dashboard.
+2. Find the workspace name from the URL in your browser's address bar or from the Workspace settings.
+   * For example, in the URL `https://app.roboflow.com/ata-dc7ry/...`, `ata-dc7ry` is your **Workspace** name.
+
+### Step 4: Create or Define Your Workflow
+Istaka Ustası uses Roboflow's **Workflows** infrastructure to analyze images.
+1. In your Roboflow Workspace, go to the **"Workflows"** tab in the left menu.
+2. Create a new workflow or link your YOLOv8-based tile detection model to the workflow.
+3. Copy the unique **Workflow ID** of your workflow.
+   * For example: `okey-and-rummikub-vrummikub-p8akb-vr0ef-3-yolov8n-t1-logic`.
+
+---
+
+## Configuring the Credentials in Istaka Ustası
+
+To input this information into the Istaka Ustası application:
+1. Open the application and click on the **Settings** (profile) button in the header.
+2. Fill in the following fields under the Roboflow Settings section:
+   - **API Key**: The copied `rf_...` secret key.
+   - **Workspace**: Your Workspace name (e.g., `ata-dc7ry`).
+   - **Workflow ID**: Your Workflow ID.
+   - **API URL**: You can leave this as the default `https://serverless.roboflow.com`.
+3. Click the **Save** button.
+
+Once your credentials are saved, the system will route all image scanning requests directly through your own account.
