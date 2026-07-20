@@ -22,6 +22,7 @@ interface SolverState {
   fetchRoboflowKeyConfig: () => Promise<void>;
   saveRoboflowKeyConfig: (key: string, workspace?: string, workflowId?: string, apiUrl?: string) => Promise<void>;
   deleteRoboflowKeyConfig: () => Promise<void>;
+  updateUserProfile: (username: string) => Promise<void>;
 
   // Rack Grid (2 rows of 20 slots = 40 slots)
   rack: (Tile | null)[];
@@ -130,6 +131,16 @@ export const useStore = create<SolverState>((set, get) => ({
     try {
       await apiService.deleteRoboflowKey();
       set({ roboflowKeyConfig: { has_key: false } });
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  updateUserProfile: async (username) => {
+    try {
+      const profile = await apiService.updateProfile(username);
+      set({ user: profile });
+      localStorage.setItem('user', JSON.stringify(profile));
     } catch (err) {
       throw err;
     }

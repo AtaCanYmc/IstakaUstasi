@@ -35,3 +35,7 @@ class RoboflowKeyResponse(BaseModel):
     workspace: Optional[str] = None
     workflow_id: Optional[str] = None
     api_url: Optional[str] = None
+
+
+class ProfileUpdateRequest(BaseModel):
+    username: str

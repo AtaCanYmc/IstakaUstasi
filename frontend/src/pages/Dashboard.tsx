@@ -16,6 +16,7 @@ export const Dashboard: React.FC = () => {
     roboflowKeyConfig,
     saveRoboflowKeyConfig,
     deleteRoboflowKeyConfig,
+    updateUserProfile,
     strategy,
     setStrategy,
     allowOneAfter,
@@ -37,10 +38,17 @@ export const Dashboard: React.FC = () => {
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
+  const [customUsername, setCustomUsername] = useState('');
   const [customApiKey, setCustomApiKey] = useState('');
   const [customWorkspace, setCustomWorkspace] = useState('');
   const [customWorkflowId, setCustomWorkflowId] = useState('');
   const [customApiUrl, setCustomApiUrl] = useState('');
+
+  useEffect(() => {
+    if (user) {
+      setCustomUsername(user.username || '');
+    }
+  }, [user]);
 
   useEffect(() => {
     if (roboflowKeyConfig) {
@@ -340,6 +348,52 @@ export const Dashboard: React.FC = () => {
               <p className="text-xs text-text-secondary mt-1">
                 {t('roboflowSettingsDesc')}
               </p>
+            </div>
+
+            {/* Profile Settings Section */}
+            <div className="space-y-4 pb-4 border-b border-card-border">
+              <h4 className="text-xs uppercase font-bold tracking-wider text-indigo-500 flex items-center gap-1.5">
+                {t('profileSettings')}
+              </h4>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] uppercase font-black text-text-tertiary tracking-wider">{t('email')}</label>
+                  <input
+                    type="text"
+                    value={user?.email || ''}
+                    disabled
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-card-border bg-bg-secondary/50 text-sm text-text-tertiary cursor-not-allowed"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] uppercase font-black text-text-tertiary tracking-wider">{t('username')}</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={customUsername}
+                      onChange={(e) => setCustomUsername(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-card-border bg-bg-secondary text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-text-primary"
+                    />
+                    <button
+                      onClick={async () => {
+                        if (!customUsername.trim()) {
+                          alert('Username cannot be empty');
+                          return;
+                        }
+                        try {
+                          await updateUserProfile(customUsername);
+                          alert(t('profileUpdated'));
+                        } catch {
+                          alert(t('alertProfileUpdateFailed'));
+                        }
+                      }}
+                      className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer"
+                    >
+                      {t('update')}
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {roboflowKeyConfig?.has_key && (

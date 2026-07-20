@@ -114,6 +114,11 @@ export const apiService = {
     }
   },
 
+  async updateProfile(username: string): Promise<UserProfile> {
+    const res = await api.put<UserProfile>('/auth/profile', { username });
+    return res.data;
+  },
+
   async getRoboflowKey(): Promise<RoboflowKeyResponse> {
     const res = await api.get<RoboflowKeyResponse>('/auth/roboflow-key');
     return res.data;

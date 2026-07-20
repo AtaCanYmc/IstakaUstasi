@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.db import DatabaseFactory
+from app.db import DatabaseFactory, UserProfile
 from app.dependencies.auth import get_current_user
 from app.models.auth import (
     AuthResponse,
+    ProfileUpdateRequest,
     RoboflowKeyResponse,
     RoboflowKeySaveRequest,
     UserLoginRequest,
@@ -63,8 +64,6 @@ async def signup(req: UserSignupRequest):
     refresh_token = auth_res.session.refresh_token if auth_res.session else ""
 
     # Package as user model profile
-    from app.db import UserProfile
-
     user_profile = UserProfile(
         id=profile["id"],
         email=profile["email"],
@@ -243,5 +242,26 @@ async def delete_roboflow_key(current_user: dict = Depends(get_current_user)):
             "user_id", current_user["id"]
         ).execute()
         return {"message": "Roboflow key configuration deleted successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.put("/profile", response_model=UserProfile)
+async def update_profile(
+    req: ProfileUpdateRequest,
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    Updates the authenticated user's profile details (e.g., username).
+    """
+    provider = DatabaseFactory.get_provider()
+    user_repo = provider.get_user_repository()
+
+    try:
+        updated_user = await user_repo.update_user(
+            current_user["id"],
+            {"username": req.username},
+        )
+        return updated_user
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

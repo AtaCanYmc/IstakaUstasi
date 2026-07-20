@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -95,3 +95,28 @@ def test_roboflow_key_endpoints_flow(mock_get_provider):
     response = client.delete("/api/v1/auth/roboflow-key")
     assert response.status_code == 200
     assert "deleted successfully" in response.json()["message"]
+
+
+@patch("app.db.DatabaseFactory.get_provider")
+def test_update_profile_endpoint(mock_get_provider):
+    mock_provider = MagicMock()
+    mock_user_repo = MagicMock()
+    mock_provider.get_user_repository.return_value = mock_user_repo
+    mock_get_provider.return_value = mock_provider
+
+    from app.db.base import UserProfile
+
+    mock_profile = UserProfile(
+        id="test-user-id",
+        email="test@example.com",
+        username="new_name",
+        image_quota_count=3,
+        last_reset_date="2026-07-20T19:00:00",
+        created_at="2026-07-20T19:00:00",
+        updated_at="2026-07-20T19:00:00",
+    )
+    mock_user_repo.update_user = AsyncMock(return_value=mock_profile)
+
+    response = client.put("/api/v1/auth/profile", json={"username": "new_name"})
+    assert response.status_code == 200
+    assert response.json()["username"] == "new_name"

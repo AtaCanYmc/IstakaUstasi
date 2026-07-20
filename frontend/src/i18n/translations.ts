@@ -77,7 +77,12 @@ export const translations = {
     remove: "Kaldır",
     statusConfigured: "Aktif",
     statusNotConfigured: "Devre Dışı",
-    customKeyActive: "Özel anahtar aktif: Sınırsız tarama hakkı."
+    customKeyActive: "Özel anahtar aktif: Sınırsız tarama hakkı.",
+    profileSettings: "Profil Ayarları",
+    profileSettingsDesc: "Kullanıcı profil bilgilerinizi güncelleyin.",
+    update: "Güncelle",
+    profileUpdated: "Profil başarıyla güncellendi.",
+    alertProfileUpdateFailed: "Profil güncellenemedi."
   },
   en: {
     title: "Istaka Ustası",
@@ -155,7 +160,12 @@ export const translations = {
     remove: "Remove",
     statusConfigured: "Active",
     statusNotConfigured: "Disabled",
-    customKeyActive: "Custom key active: Unlimited scans."
+    customKeyActive: "Custom key active: Unlimited scans.",
+    profileSettings: "Profile Settings",
+    profileSettingsDesc: "Update your user profile details.",
+    update: "Update",
+    profileUpdated: "Profile updated successfully.",
+    alertProfileUpdateFailed: "Failed to update profile."
   },
   fr: {
     title: "Istaka Ustası",
@@ -233,7 +243,12 @@ export const translations = {
     remove: "Supprimer",
     statusConfigured: "Actif",
     statusNotConfigured: "Désactivé",
-    customKeyActive: "Clé personnalisée active: Scans illimités."
+    customKeyActive: "Clé personnalisée active: Scans illimités.",
+    profileSettings: "Paramètres de Profil",
+    profileSettingsDesc: "Mettez à jour les détails de votre profil utilisateur.",
+    update: "Mettre à jour",
+    profileUpdated: "Profil mis à jour avec succès.",
+    alertProfileUpdateFailed: "Échec de la mise à jour du profil."
   },
   de: {
     title: "Istaka Ustası",
@@ -311,6 +326,11 @@ export const translations = {
     remove: "Entfernen",
     statusConfigured: "Aktiv",
     statusNotConfigured: "Deaktiviert",
-    customKeyActive: "Eigener Schlüssel aktiv: Unbegrenzte Scans."
+    customKeyActive: "Eigener Schlüssel aktiv: Unbegrenzte Scans.",
+    profileSettings: "Profileinstellungen",
+    profileSettingsDesc: "Aktualisieren Sie Ihre Profil-Details.",
+    update: "Aktualisieren",
+    profileUpdated: "Profil erfolgreich aktualisiert.",
+    alertProfileUpdateFailed: "Profilaktualisierung fehlgeschlagen."
   }
 };
