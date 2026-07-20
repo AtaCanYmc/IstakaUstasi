@@ -33,16 +33,11 @@ def setup_overrides():
 
 
 @patch(
-    "app.routers.vision.has_user_custom_key",
-    new_callable=AsyncMock,
-)
-@patch(
     "okey_vision.VisionEngine.process_frame_async",
     new_callable=AsyncMock,
 )
-def test_extract_vision_success(mock_process, mock_custom_key):
+def test_extract_vision_success(mock_process):
     mock_process.return_value = []
-    mock_custom_key.return_value = False
 
     # Create simple valid image bytes
     img_byte_arr = io.BytesIO()
@@ -70,16 +65,11 @@ def test_extract_vision_success(mock_process, mock_custom_key):
 
 
 @patch(
-    "app.routers.vision.has_user_custom_key",
-    new_callable=AsyncMock,
-)
-@patch(
     "okey_vision.VisionEngine.process_frame_async",
     new_callable=AsyncMock,
 )
-def test_extract_vision_without_custom_key(mock_process, mock_custom_key):
+def test_extract_vision_without_custom_key(mock_process):
     mock_process.return_value = []
-    mock_custom_key.return_value = False
 
     # Create simple valid image bytes
     img_byte_arr = io.BytesIO()
@@ -114,18 +104,13 @@ def test_get_job_status_found():
 
 
 @patch(
-    "app.routers.vision.has_user_custom_key",
-    new_callable=AsyncMock,
-)
-@patch(
     "okey_orchestrator.VisionSolverEngine.analyze_frame_async",
     new_callable=AsyncMock,
 )
-def test_solve_vision_success(mock_analyze, mock_custom_key):
+def test_solve_vision_success(mock_analyze):
     from okey_core.types import Arrangement
 
     mock_analyze.return_value = Arrangement(melds=[], remainingTiles=[], totalScore=0)
-    mock_custom_key.return_value = False
 
     # Create simple valid image bytes
     img_byte_arr = io.BytesIO()
