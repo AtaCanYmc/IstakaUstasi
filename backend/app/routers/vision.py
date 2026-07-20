@@ -133,6 +133,43 @@ async def run_solve_task(
         JobService.update_job_failure(job_id, error_detail)
 
 
+async def has_user_custom_key(
+    request: Request, current_user: dict = Depends(get_current_user)
+) -> bool:
+    """Check if user has a custom Roboflow key configured. Raises 400 if not found."""
+    provider = DatabaseFactory.get_provider()
+    client = getattr(provider, "client", None)
+    if not client:
+        raise HTTPException(
+            status_code=500, detail=get_message(request, "db_not_configured")
+        )
+
+    try:
+        res = (
+            client.table("user_roboflow_keys")
+            .select("*")
+            .eq("user_id", current_user["id"])
+            .execute()
+        )
+    except Exception as e:
+        logger.error(
+            "Failed to check user custom key",
+            user_id=current_user["id"],
+            error=str(e),
+        )
+        raise HTTPException(
+            status_code=500, detail=get_message(request, "db_not_configured")
+        )
+
+    if not res.data:
+        raise HTTPException(
+            status_code=400,
+            detail=get_message(request, "no_custom_key"),
+        )
+
+    return True
+
+
 async def get_user_roboflow_provider(
     request: Request, current_user: dict = Depends(get_current_user)
 ) -> Any:
@@ -204,6 +241,7 @@ async def extract_vision(
     background_tasks: BackgroundTasks,
     request: Request,
     image_content: bytes = Depends(validate_and_sanitize_image),
+    has_custom_key: bool = Depends(has_user_custom_key),
     pipeline: Any = Depends(get_user_roboflow_provider),
     current_user: dict = Depends(get_current_user),
 ):
@@ -234,6 +272,7 @@ async def solve_vision(
     strategy: str = Form("backtracking"),
     allow_one_after: bool = Form(True),
     image_content: bytes = Depends(validate_and_sanitize_image),
+    has_custom_key: bool = Depends(has_user_custom_key),
     pipeline: Any = Depends(get_user_roboflow_provider),
     current_user: dict = Depends(get_current_user),
 ):
