@@ -19,6 +19,8 @@ export default defineConfig({
     basicSsl(),
     VitePWA({
       registerType: 'autoUpdate',
+      injectRegister: 'inline',
+      manifestFilename: 'site.webmanifest',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
         name: 'Istaka Ustası',
