@@ -37,8 +37,11 @@ interface SolverState {
   isProcessingVision: boolean;
   visionError: string | null;
   visionConfigured: boolean;
+  isBackendWaking: boolean;
+  isBackendReady: boolean;
 
   // Setters & Actions
+  initBackendCheck: () => Promise<void>;
   setUser: (user: UserProfile | null) => void;
   setToken: (token: string | null) => void;
   initializeAuth: () => void;
@@ -157,6 +160,8 @@ export const useStore = create<SolverState>((set, get) => ({
   isProcessingVision: false,
   visionError: null,
   visionConfigured: false,
+  isBackendWaking: false,
+  isBackendReady: false,
 
   setUser: (user) => set({ user }),
   setToken: (token) => set({ token }),
@@ -458,10 +463,34 @@ export const useStore = create<SolverState>((set, get) => ({
     }
   },
 
+  initBackendCheck: async () => {
+    if (get().isBackendReady) return;
+
+    let wakingTimeout = setTimeout(() => {
+      set({ isBackendWaking: true });
+    }, 1500);
+
+    const poll = async () => {
+      try {
+        const data = await apiService.getHealth();
+        clearTimeout(wakingTimeout);
+        set({
+          isBackendWaking: false,
+          isBackendReady: true,
+          visionConfigured: data.vision_configured
+        });
+      } catch (err) {
+        setTimeout(poll, 3000);
+      }
+    };
+
+    await poll();
+  },
+
   checkHealth: async () => {
     try {
       const data = await apiService.getHealth();
-      set({ visionConfigured: data.vision_configured });
+      set({ visionConfigured: data.vision_configured, isBackendReady: true });
     } catch (err) {}
   }
 }));

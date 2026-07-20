@@ -83,7 +83,9 @@ export const translations = {
     update: "Güncelle",
     profileUpdated: "Profil başarıyla güncellendi.",
     alertProfileUpdateFailed: "Profil güncellenemedi.",
-    howToGetApiKey: "API Anahtarını Nasıl Alırım?"
+    howToGetApiKey: "API Anahtarını Nasıl Alırım?",
+    wakingServerTitle: "Sunucu Uyandırılıyor...",
+    wakingServerDesc: "Sunucu boşta kaldığı için uyku moduna geçmiş olabilir. Bu işlem 1 dakikaya kadar sürebilir."
   },
   en: {
     title: "Istaka Ustası",
@@ -167,7 +169,9 @@ export const translations = {
     update: "Update",
     profileUpdated: "Profile updated successfully.",
     alertProfileUpdateFailed: "Failed to update profile.",
-    howToGetApiKey: "How to get an API Key?"
+    howToGetApiKey: "How to get an API Key?",
+    wakingServerTitle: "Waking Up Server...",
+    wakingServerDesc: "The server might have gone to sleep due to inactivity. This can take up to 1 minute."
   },
   fr: {
     title: "Istaka Ustası",
@@ -251,7 +255,9 @@ export const translations = {
     update: "Mettre à jour",
     profileUpdated: "Profil mis à jour avec succès.",
     alertProfileUpdateFailed: "Échec de la mise à jour du profil.",
-    howToGetApiKey: "Comment obtenir une clé API?"
+    howToGetApiKey: "Comment obtenir une clé API?",
+    wakingServerTitle: "Réveil du Serveur...",
+    wakingServerDesc: "Le serveur s'est peut-être endormi par inactivité. Cela peut prendre jusqu'à 1 minute."
   },
   de: {
     title: "Istaka Ustası",
@@ -335,6 +341,8 @@ export const translations = {
     update: "Aktualisieren",
     profileUpdated: "Profil erfolgreich aktualisiert.",
     alertProfileUpdateFailed: "Profilaktualisierung fehlgeschlagen.",
-    howToGetApiKey: "Wie bekomme ich einen API-Schlüssel?"
+    howToGetApiKey: "Wie bekomme ich einen API-Schlüssel?",
+    wakingServerTitle: "Server aufwecken...",
+    wakingServerDesc: "Der Server ist möglicherweise wegen Inaktivität in den Ruhezustand gewechselt. Dies kann bis zu 1 Minute dauern."
   }
 };
