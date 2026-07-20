@@ -44,6 +44,7 @@ jobs:
         working-directory: frontend
         env:
           VITE_API_URL: https://istakaustasi.onrender.com/api/v1
+          VITE_BASE_PATH: /IstakaUstasi/
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
