@@ -4,7 +4,6 @@ import { Camera, Upload, AlertCircle, Loader2, Sparkles } from 'lucide-react';
 
 export const VisionUpload: React.FC = () => {
   const {
-    user,
     token,
     isProcessingVision,
     visionError,
@@ -89,12 +88,6 @@ export const VisionUpload: React.FC = () => {
           </h2>
           <p className="text-xs text-text-secondary">{t('scanDesc')}</p>
         </div>
-
-        {user && (
-          <div className="px-3 py-1 rounded-full bg-indigo-950/20 dark:bg-indigo-950/50 border border-indigo-500/20 dark:border-indigo-900/30 text-indigo-600 dark:text-indigo-300 text-[10px] font-bold">
-            {t('quotaLeft', { count: user.image_quota_count })}
-          </div>
-        )}
       </div>
 
       {!token ? (
