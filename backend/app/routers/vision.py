@@ -13,7 +13,6 @@ from fastapi import (
 
 # Import okey types and functions
 from okey_core.types import OkeyMeta, TileColor
-from okey_server.dependencies import get_roboflow_workflow_provider
 
 from app.db import DatabaseFactory
 from app.dependencies.auth import get_current_user
@@ -110,40 +109,52 @@ async def get_user_roboflow_provider(
 ) -> Any:
     provider = DatabaseFactory.get_provider()
     client = getattr(provider, "client", None)
-    if client:
-        try:
-            res = (
-                client.table("user_roboflow_keys")
-                .select("*")
-                .eq("user_id", current_user["id"])
-                .execute()
-            )
-            if res.data:
-                row = res.data[0]
-                workspace = row.get("workspace") or "ata-dc7ry"
-                workflow_id = (
-                    row.get("workflow_id")
-                    or "okey-and-rummikub-vrummikub-p8akb-vr0ef-3-yolov8n-t1-logic"
-                )
-                api_url = row.get("api_url") or "https://serverless.roboflow.com"
+    if not client:
+        raise HTTPException(
+            status_code=500, detail="Database provider client not configured."
+        )
 
-                registry = request.app.state.provider_registry
-                return registry.get_roboflow_workflow_provider(
-                    api_key=row["api_key"],
-                    workspace_name=workspace,
-                    workflow_id=workflow_id,
-                    api_url=api_url,
-                )
-        except Exception as e:
-            logger.warn(
-                "Failed to retrieve custom Roboflow provider, "
-                "falling back to system defaults",
-                user_id=current_user["id"],
-                error=str(e),
-            )
+    try:
+        res = (
+            client.table("user_roboflow_keys")
+            .select("*")
+            .eq("user_id", current_user["id"])
+            .execute()
+        )
+    except Exception as e:
+        logger.error(
+            "Failed to retrieve user Roboflow credentials",
+            user_id=current_user["id"],
+            error=str(e),
+        )
+        raise HTTPException(
+            status_code=500, detail="Internal server database connection error."
+        )
 
-    # Fallback to standard provider
-    return get_roboflow_workflow_provider(request=request)
+    if not res.data:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Roboflow API key is required to use vision tasks. "
+                "Please configure your custom API key in the settings."
+            ),
+        )
+
+    row = res.data[0]
+    workspace = row.get("workspace") or "ata-dc7ry"
+    workflow_id = (
+        row.get("workflow_id")
+        or "okey-and-rummikub-vrummikub-p8akb-vr0ef-3-yolov8n-t1-logic"
+    )
+    api_url = row.get("api_url") or "https://serverless.roboflow.com"
+
+    registry = request.app.state.provider_registry
+    return registry.get_roboflow_workflow_provider(
+        api_key=row["api_key"],
+        workspace_name=workspace,
+        workflow_id=workflow_id,
+        api_url=api_url,
+    )
 
 
 @router.post(
