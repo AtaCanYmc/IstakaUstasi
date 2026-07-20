@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: istaka-ustasi-backend
+    env: docker
+    dockerfilePath: Dockerfile
+    dockerContext: .
+    rootDir: backend
+    plan: free
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: OKEY_RF_KEY
+        sync: false
+      - key: OKEY_RF_WORKSPACE
+        sync: false
+      - key: OKEY_RF_WORKFLOW_ID
+        sync: false
+      - key: OKEY_RF_API_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false

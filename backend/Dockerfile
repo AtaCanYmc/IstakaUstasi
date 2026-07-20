@@ -28,5 +28,5 @@ COPY app/ /app/app/
 # Expose port
 EXPOSE 8000
 
-# Run the backend using uvicorn as a package module
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run the backend using uvicorn as a package module, dynamically reading the PORT environment variable
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
