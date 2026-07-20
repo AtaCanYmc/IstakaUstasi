@@ -1,0 +1,21 @@
+# Istaka Ustası (Okey Solver & Vision Assistant)
+
+Istaka Ustası is a helper application designed to solve and arrange Okey and Rummikub tile hands from images or manual inputs.
+
+## Technology Stack
+- **Frontend**: React (Vite, TypeScript, TailwindCSS, Zustand, Lucide Icons)
+- **Backend**: FastAPI (Python, Supabase DB/Auth, Roboflow Vision Workflow API)
+
+## Project Structure
+- `/frontend`: User Interface web client.
+  - `src/components`: UI components (Board, Header, SettingsModal, TilePool, VisionUpload, AuthModal).
+  - `src/store`: State management via Zustand.
+- `/backend`: API Gateway for orchestration, database connections, and model inference.
+  - `app/routers`: vision processing and authentication routes.
+  - `app/services`: orchestration pipelines, credential encryption, and quotas.
+
+## Key Features
+- Manual tile placement pool and drag-and-drop grid interfaces.
+- YOLOv8-powered image segmentation and tile recognition workflow pipeline via Roboflow.
+- Multi-algorithm solver strategies (Backtracking, Greedy, Integer Linear Programming (ILP), Hybrid) to find optimal run/group arrangements.
+- Bring-Your-Own-Key (BYOK) system for custom Roboflow workflows.

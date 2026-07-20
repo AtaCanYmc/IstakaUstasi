@@ -1,0 +1,10 @@
+/* TEAM */
+Developer: Ata Can
+Github: https://github.com/AtaCanYmc
+
+/* THANKS */
+Powered by: Vite, React, FastAPI, Roboflow
+
+/* SITE */
+Standards: HTML5, CSS3, ES6
+Software: React, TypeScript, TailwindCSS, Zustand
