@@ -20,7 +20,6 @@ from app.dependencies.image_validation import validate_and_sanitize_image
 from app.models.vision import ExtractResultCustom, JobStatusResponse
 from app.services.encryption import EncryptionService
 from app.services.job_service import JobService
-from app.services.user_service import UserService
 from app.utils.i18n import get_language, get_message
 
 logger = structlog.get_logger("okey_bridge_server.routers.vision")
@@ -134,23 +133,6 @@ async def run_solve_task(
         JobService.update_job_failure(job_id, error_detail)
 
 
-async def has_user_custom_key(user_id: str) -> bool:
-    provider = DatabaseFactory.get_provider()
-    client = getattr(provider, "client", None)
-    if not client:
-        return False
-    try:
-        res = (
-            client.table("user_roboflow_keys")
-            .select("api_key")
-            .eq("user_id", user_id)
-            .execute()
-        )
-        return len(res.data) > 0
-    except Exception:
-        return False
-
-
 async def get_user_roboflow_provider(
     request: Request, current_user: dict = Depends(get_current_user)
 ) -> Any:
@@ -229,15 +211,6 @@ async def extract_vision(
     Triggers detection and extraction of Okey tiles from an image.
     Runs asynchronously and returns a 202 Accepted status with a job ID.
     """
-    # Check/Decrement quota if user has no custom Roboflow key
-    # (unlimited access for custom keys)
-    if not await has_user_custom_key(current_user["id"]):
-        if not await UserService.check_and_update_quota(current_user["id"]):
-            raise HTTPException(
-                status_code=402,
-                detail=get_message(request, "quota_exceeded"),
-            )
-
     job_id = JobService.create_job()
     background_tasks.add_task(
         run_extract_task,
@@ -268,15 +241,6 @@ async def solve_vision(
     Processes an uploaded board image and directly solves the optimal arrangement.
     Runs asynchronously and returns a 202 Accepted status with a job ID.
     """
-    # Check/Decrement quota if user has no custom Roboflow key
-    # (unlimited access for custom keys)
-    if not await has_user_custom_key(current_user["id"]):
-        if not await UserService.check_and_update_quota(current_user["id"]):
-            raise HTTPException(
-                status_code=402,
-                detail=get_message(request, "quota_exceeded"),
-            )
-
     okey_meta = None
     if okey_meta_color and okey_meta_value is not None:
         okey_meta = OkeyMeta(color=okey_meta_color, value=okey_meta_value)

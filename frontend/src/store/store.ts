@@ -48,7 +48,6 @@ interface SolverState {
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, username: string, password: string) => Promise<void>;
   logout: () => void;
-  refreshQuota: () => Promise<void>;
 
   // Rack actions
   setRack: (rack: (Tile | null)[]) => void;
@@ -245,16 +244,6 @@ export const useStore = create<SolverState>((set, get) => ({
     set({ token: null, user: null, roboflowKeyConfig: null });
   },
 
-  refreshQuota: async () => {
-    if (get().token) {
-      try {
-        const res = await apiService.syncUser();
-        set({ user: res.profile });
-        localStorage.setItem('user', JSON.stringify(res.profile));
-      } catch {}
-    }
-  },
-
   setRack: (rack) => set({ rack }),
 
   clearRack: () => set({ rack: Array(RACK_SIZE).fill(null), solverResult: null }),
@@ -405,7 +394,6 @@ export const useStore = create<SolverState>((set, get) => ({
         }
       });
       set({ rack: newRack, isProcessingVision: false });
-      await get().refreshQuota();
     } catch (err: any) {
       const msg = err.response?.data?.detail || err.message || 'Failed to extract tiles from image.';
       set({ visionError: msg, isProcessingVision: false });
@@ -455,7 +443,6 @@ export const useStore = create<SolverState>((set, get) => ({
         set({ rack: newRack });
       }
       set({ isProcessingVision: false });
-      await get().refreshQuota();
     } catch (err: any) {
       const msg = err.response?.data?.detail || err.message || 'Failed to solve hand from image.';
       set({ visionError: msg, isProcessingVision: false });

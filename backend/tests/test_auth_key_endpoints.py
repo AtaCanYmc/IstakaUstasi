@@ -110,8 +110,6 @@ def test_update_profile_endpoint(mock_get_provider):
         id="test-user-id",
         email="test@example.com",
         username="new_name",
-        image_quota_count=3,
-        last_reset_date="2026-07-20T19:00:00",
         created_at="2026-07-20T19:00:00",
         updated_at="2026-07-20T19:00:00",
     )

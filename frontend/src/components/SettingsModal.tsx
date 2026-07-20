@@ -18,11 +18,15 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
     t,
   } = useStore();
 
+  const DEFAULT_WORKSPACE   = 'ata-dc7ry';
+  const DEFAULT_WORKFLOW_ID = 'okey-and-rummikub-vrummikub-p8akb-vr0ef-3-yolov8n-t1-logic';
+  const DEFAULT_API_URL     = 'https://serverless.roboflow.com';
+
   const [customUsername, setCustomUsername] = useState('');
   const [customApiKey, setCustomApiKey] = useState('');
-  const [customWorkspace, setCustomWorkspace] = useState('');
-  const [customWorkflowId, setCustomWorkflowId] = useState('');
-  const [customApiUrl, setCustomApiUrl] = useState('');
+  const [customWorkspace, setCustomWorkspace] = useState(DEFAULT_WORKSPACE);
+  const [customWorkflowId, setCustomWorkflowId] = useState(DEFAULT_WORKFLOW_ID);
+  const [customApiUrl, setCustomApiUrl] = useState(DEFAULT_API_URL);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
 
   useEffect(() => {
@@ -34,9 +38,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (roboflowKeyConfig) {
       setCustomApiKey(roboflowKeyConfig.has_key ? '••••••••••••••••' : '');
-      setCustomWorkspace(roboflowKeyConfig.workspace || '');
-      setCustomWorkflowId(roboflowKeyConfig.workflow_id || '');
-      setCustomApiUrl(roboflowKeyConfig.api_url || '');
+      setCustomWorkspace(roboflowKeyConfig.workspace || DEFAULT_WORKSPACE);
+      setCustomWorkflowId(roboflowKeyConfig.workflow_id || DEFAULT_WORKFLOW_ID);
+      setCustomApiUrl(roboflowKeyConfig.api_url || DEFAULT_API_URL);
     }
   }, [roboflowKeyConfig]);
 

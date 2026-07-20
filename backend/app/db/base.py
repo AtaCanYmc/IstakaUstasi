@@ -19,17 +19,8 @@ class UserProfile(BaseModel):
     id: str
     email: str
     username: Optional[str] = None
-    image_quota_count: int
-    last_reset_date: str
     created_at: str
     updated_at: str
-
-
-class UserQuota(BaseModel):
-    user_id: str
-    quota_type: str
-    quota_count: int
-    last_reset_date: str
 
 
 class IUserRepository(ABC):
@@ -44,7 +35,6 @@ class IUserRepository(ABC):
         user_id: str,
         email: str,
         username: Optional[str] = None,
-        initial_image_quota: int = 3,
     ) -> UserProfile:
         """Create new user profile"""
         pass
