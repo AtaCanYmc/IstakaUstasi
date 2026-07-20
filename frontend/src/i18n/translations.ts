@@ -82,7 +82,8 @@ export const translations = {
     profileSettingsDesc: "Kullanıcı profil bilgilerinizi güncelleyin.",
     update: "Güncelle",
     profileUpdated: "Profil başarıyla güncellendi.",
-    alertProfileUpdateFailed: "Profil güncellenemedi."
+    alertProfileUpdateFailed: "Profil güncellenemedi.",
+    howToGetApiKey: "API Anahtarını Nasıl Alırım?"
   },
   en: {
     title: "Istaka Ustası",
@@ -165,7 +166,8 @@ export const translations = {
     profileSettingsDesc: "Update your user profile details.",
     update: "Update",
     profileUpdated: "Profile updated successfully.",
-    alertProfileUpdateFailed: "Failed to update profile."
+    alertProfileUpdateFailed: "Failed to update profile.",
+    howToGetApiKey: "How to get an API Key?"
   },
   fr: {
     title: "Istaka Ustası",
@@ -248,7 +250,8 @@ export const translations = {
     profileSettingsDesc: "Mettez à jour les détails de votre profil utilisateur.",
     update: "Mettre à jour",
     profileUpdated: "Profil mis à jour avec succès.",
-    alertProfileUpdateFailed: "Échec de la mise à jour du profil."
+    alertProfileUpdateFailed: "Échec de la mise à jour du profil.",
+    howToGetApiKey: "Comment obtenir une clé API?"
   },
   de: {
     title: "Istaka Ustası",
@@ -331,6 +334,7 @@ export const translations = {
     profileSettingsDesc: "Aktualisieren Sie Ihre Profil-Details.",
     update: "Aktualisieren",
     profileUpdated: "Profil erfolgreich aktualisiert.",
-    alertProfileUpdateFailed: "Profilaktualisierung fehlgeschlagen."
+    alertProfileUpdateFailed: "Profilaktualisierung fehlgeschlagen.",
+    howToGetApiKey: "Wie bekomme ich einen API-Schlüssel?"
   }
 };

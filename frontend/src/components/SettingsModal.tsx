@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../store/store';
 import { Key } from 'lucide-react';
+import { RoboflowGuideModal } from './RoboflowGuideModal';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   const [customWorkspace, setCustomWorkspace] = useState('');
   const [customWorkflowId, setCustomWorkflowId] = useState('');
   const [customApiUrl, setCustomApiUrl] = useState('');
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -109,7 +111,16 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
 
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-[10px] uppercase font-black text-text-tertiary tracking-wider">{t('apiKey')}</label>
+            <div className="flex justify-between items-center">
+              <label className="text-[10px] uppercase font-black text-text-tertiary tracking-wider">{t('apiKey')}</label>
+              <button
+                type="button"
+                onClick={() => setIsGuideOpen(true)}
+                className="text-[10px] font-bold text-indigo-500 hover:text-indigo-400 transition-all cursor-pointer"
+              >
+                {t('howToGetApiKey')}
+              </button>
+            </div>
             <input
               type="password"
               value={customApiKey}
@@ -201,6 +212,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
       </div>
+      <RoboflowGuideModal isOpen={isGuideOpen} onClose={() => setIsGuideOpen(false)} />
     </div>
   );
 };
