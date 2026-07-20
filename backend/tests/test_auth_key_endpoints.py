@@ -66,11 +66,14 @@ def test_roboflow_key_endpoints_flow(mock_get_provider):
     assert data["workspace"] == "my-workspace"
 
     # 3. GET key (configured)
+    from app.services.encryption import EncryptionService
+
+    encrypted_val = EncryptionService.encrypt("test_rf_key_value_long_enough")
     mock_eq.execute.return_value = MagicMock(
         data=[
             {
                 "user_id": "test-user-id",
-                "api_key": "test_rf_key_value_long_enough",
+                "api_key": encrypted_val,
                 "workspace": "my-workspace",
                 "workflow_id": "my-workflow",
                 "api_url": "https://serverless.roboflow.com",

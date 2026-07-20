@@ -9,6 +9,7 @@ from app.models.auth import (
     UserLoginRequest,
     UserSignupRequest,
 )
+from app.services.encryption import EncryptionService
 from app.services.user_service import UserService
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
@@ -140,8 +141,17 @@ async def get_roboflow_key(current_user: dict = Depends(get_current_user)):
             return RoboflowKeyResponse(has_key=False)
 
         row = res.data[0]
-        raw_key = row["api_key"]
-        masked = raw_key[:4] + "..." + raw_key[-4:] if len(raw_key) > 8 else "..."
+        encrypted_key = row["api_key"]
+        try:
+            decrypted_key = EncryptionService.decrypt(encrypted_key)
+        except Exception:
+            decrypted_key = ""
+
+        masked = (
+            decrypted_key[:4] + "..." + decrypted_key[-4:]
+            if len(decrypted_key) > 8
+            else "..."
+        )
 
         return RoboflowKeyResponse(
             has_key=True,
@@ -166,7 +176,8 @@ async def save_roboflow_key(
     if not client:
         raise HTTPException(status_code=500, detail="Database client not configured.")
 
-    existing_key = None
+    encrypted_key = None
+    decrypted_key = ""
     if not req.api_key or req.api_key == "••••••••••••••••":
         try:
             res = (
@@ -176,18 +187,24 @@ async def save_roboflow_key(
                 .execute()
             )
             if res.data:
-                existing_key = res.data[0]["api_key"]
+                encrypted_key = res.data[0]["api_key"]
+                try:
+                    decrypted_key = EncryptionService.decrypt(encrypted_key)
+                except Exception:
+                    decrypted_key = ""
             else:
                 raise HTTPException(status_code=400, detail="API Key is required.")
         except HTTPException:
             raise
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
+    else:
+        decrypted_key = req.api_key
+        encrypted_key = EncryptionService.encrypt(req.api_key)
 
-    active_key = existing_key if existing_key else req.api_key
     payload = {
         "user_id": current_user["id"],
-        "api_key": active_key,
+        "api_key": encrypted_key,
         "workspace": req.workspace,
         "workflow_id": req.workflow_id,
         "api_url": req.api_url,
@@ -196,7 +213,9 @@ async def save_roboflow_key(
     try:
         client.table("user_roboflow_keys").upsert(payload).execute()
         masked = (
-            active_key[:4] + "..." + active_key[-4:] if len(active_key) > 8 else "..."
+            decrypted_key[:4] + "..." + decrypted_key[-4:]
+            if len(decrypted_key) > 8
+            else "..."
         )
         return RoboflowKeyResponse(
             has_key=True,

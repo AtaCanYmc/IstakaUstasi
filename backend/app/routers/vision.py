@@ -18,6 +18,7 @@ from app.db import DatabaseFactory
 from app.dependencies.auth import get_current_user
 from app.dependencies.image_validation import validate_and_sanitize_image
 from app.models.vision import ExtractResultCustom, JobStatusResponse
+from app.services.encryption import EncryptionService
 from app.services.job_service import JobService
 from app.services.user_service import UserService
 
@@ -148,9 +149,21 @@ async def get_user_roboflow_provider(
     )
     api_url = row.get("api_url") or "https://serverless.roboflow.com"
 
+    try:
+        decrypted_key = EncryptionService.decrypt(row["api_key"])
+    except Exception as e:
+        logger.error(
+            "Failed to decrypt user Roboflow credentials",
+            user_id=current_user["id"],
+            error=str(e),
+        )
+        raise HTTPException(
+            status_code=500, detail="Error decrypting your custom API key."
+        )
+
     registry = request.app.state.provider_registry
     return registry.get_roboflow_workflow_provider(
-        api_key=row["api_key"],
+        api_key=decrypted_key,
         workspace_name=workspace,
         workflow_id=workflow_id,
         api_url=api_url,
