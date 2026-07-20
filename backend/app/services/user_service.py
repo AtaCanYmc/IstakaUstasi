@@ -26,8 +26,7 @@ class UserService:
                     user_id,
                     email,
                     username=username,
-                    initial_image_quota=10,
-                    initial_solver_quota=100,
+                    initial_image_quota=3,
                 )
                 logger.info(
                     "Created new user profile in database",
@@ -75,12 +74,11 @@ class UserService:
 
             if should_reset:
                 logger.info("Weekly quota reset triggered for user", user_id=user_id)
-                quota = 5
+                quota = 3
                 user = await user_repo.update_user(
                     user_id,
                     {
                         "image_quota_count": quota,
-                        "solver_quota_count": 20,
                         "last_reset_date": now.isoformat(),
                     },
                 )

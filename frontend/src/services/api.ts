@@ -32,7 +32,6 @@ export interface UserProfile {
   email: string;
   username: string;
   image_quota_count: number;
-  solver_quota_count: number;
   last_reset_date: string;
   created_at: string;
   updated_at: string;

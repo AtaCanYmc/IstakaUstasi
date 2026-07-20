@@ -20,7 +20,6 @@ class UserProfile(BaseModel):
     email: str
     username: Optional[str] = None
     image_quota_count: int
-    solver_quota_count: int
     last_reset_date: str
     created_at: str
     updated_at: str
@@ -45,8 +44,7 @@ class IUserRepository(ABC):
         user_id: str,
         email: str,
         username: Optional[str] = None,
-        initial_image_quota: int = 5,
-        initial_solver_quota: int = 100,
+        initial_image_quota: int = 3,
     ) -> UserProfile:
         """Create new user profile"""
         pass

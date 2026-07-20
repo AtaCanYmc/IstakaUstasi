@@ -69,7 +69,6 @@ async def signup(req: UserSignupRequest):
         email=profile["email"],
         username=profile["username"],
         image_quota_count=profile["image_quota_count"],
-        solver_quota_count=profile["solver_quota_count"],
         last_reset_date=profile["last_reset_date"],
         created_at=profile["created_at"],
         updated_at=profile["updated_at"],

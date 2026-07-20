@@ -26,7 +26,6 @@ class SupabaseUserRepository(IUserRepository):
             email=data["email"],
             username=data.get("username"),
             image_quota_count=data["image_quota_count"],
-            solver_quota_count=data.get("solver_quota_count", 20),
             last_reset_date=data["last_reset_date"],
             created_at=data["created_at"],
             updated_at=data["updated_at"],
@@ -56,10 +55,7 @@ class SupabaseUserRepository(IUserRepository):
 
         user_data = res.data[0]
         user_data["image_quota_count"] = (
-            quotas.get("image").quota_count if quotas.get("image") else 5
-        )
-        user_data["solver_quota_count"] = (
-            quotas.get("solver").quota_count if quotas.get("solver") else 20
+            quotas.get("image").quota_count if quotas.get("image") else 3
         )
         user_data["last_reset_date"] = (
             quotas.get("image").last_reset_date
@@ -73,8 +69,7 @@ class SupabaseUserRepository(IUserRepository):
         user_id: str,
         email: str,
         username: Optional[str] = None,
-        initial_image_quota: int = 10,
-        initial_solver_quota: int = 100,
+        initial_image_quota: int = 3,
     ) -> UserProfile:
         from datetime import datetime, timezone
 
@@ -97,18 +92,11 @@ class SupabaseUserRepository(IUserRepository):
                     "quota_count": initial_image_quota,
                     "last_reset_date": now_str,
                 },
-                {
-                    "user_id": user_id,
-                    "quota_type": "solver",
-                    "quota_count": initial_solver_quota,
-                    "last_reset_date": now_str,
-                },
             ]
         ).execute()
 
         user_data = res.data[0]
         user_data["image_quota_count"] = initial_image_quota
-        user_data["solver_quota_count"] = initial_solver_quota
         user_data["last_reset_date"] = now_str
         return self._map_user_data(user_data)
 
@@ -120,7 +108,7 @@ class SupabaseUserRepository(IUserRepository):
 
         # Extract quota parameters if present
         image_quota = updates_copy.pop("image_quota_count", None)
-        solver_quota = updates_copy.pop("solver_quota_count", None)
+        updates_copy.pop("solver_quota_count", None)
         last_reset = updates_copy.pop("last_reset_date", None)
 
         if updates_copy:
@@ -133,15 +121,6 @@ class SupabaseUserRepository(IUserRepository):
                 quota_up["last_reset_date"] = last_reset
             self.client.table("user_quotas").upsert(
                 {"user_id": user_id, "quota_type": "image", **quota_up},
-                on_conflict="user_id,quota_type",
-            ).execute()
-
-        if solver_quota is not None:
-            quota_up = {"quota_count": solver_quota}
-            if last_reset:
-                quota_up["last_reset_date"] = last_reset
-            self.client.table("user_quotas").upsert(
-                {"user_id": user_id, "quota_type": "solver", **quota_up},
                 on_conflict="user_id,quota_type",
             ).execute()
 

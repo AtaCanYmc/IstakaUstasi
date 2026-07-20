@@ -168,7 +168,7 @@ async def extract_vision(
             raise HTTPException(
                 status_code=402,
                 detail=(
-                    "Quota exceeded. Weekly quota limits you to " "5 image extractions."
+                    "Quota exceeded. Weekly quota limits you to " "3 image extractions."
                 ),
             )
 
@@ -205,7 +205,7 @@ async def solve_vision(
             raise HTTPException(
                 status_code=402,
                 detail=(
-                    "Quota exceeded. Weekly quota limits you to " "5 image extractions."
+                    "Quota exceeded. Weekly quota limits you to " "3 image extractions."
                 ),
             )
 
