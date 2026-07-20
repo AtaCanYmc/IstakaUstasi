@@ -40,12 +40,7 @@ def setup_overrides():
     "okey_vision.VisionEngine.process_frame_async",
     new_callable=AsyncMock,
 )
-@patch(
-    "app.services.user_service.UserService.check_and_update_quota",
-    new_callable=AsyncMock,
-)
-def test_extract_vision_success(mock_quota, mock_process, mock_custom_key):
-    mock_quota.return_value = True
+def test_extract_vision_success(mock_process, mock_custom_key):
     mock_process.return_value = []
     mock_custom_key.return_value = False
 
@@ -79,11 +74,11 @@ def test_extract_vision_success(mock_quota, mock_process, mock_custom_key):
     new_callable=AsyncMock,
 )
 @patch(
-    "app.services.user_service.UserService.check_and_update_quota",
+    "okey_vision.VisionEngine.process_frame_async",
     new_callable=AsyncMock,
 )
-def test_extract_vision_quota_exceeded(mock_quota, mock_custom_key):
-    mock_quota.return_value = False
+def test_extract_vision_without_custom_key(mock_process, mock_custom_key):
+    mock_process.return_value = []
     mock_custom_key.return_value = False
 
     # Create simple valid image bytes
@@ -97,8 +92,10 @@ def test_extract_vision_quota_exceeded(mock_quota, mock_custom_key):
         files={"file": ("test.png", img_byte_arr, "image/png")},
     )
 
-    assert response.status_code == 402
-    assert "Quota exceeded" in response.json()["detail"]
+    assert response.status_code == 202
+    data = response.json()
+    assert "job_id" in data
+    assert data["status"] == "processing"
 
 
 def test_get_job_status_not_found():
@@ -124,12 +121,7 @@ def test_get_job_status_found():
     "okey_orchestrator.VisionSolverEngine.analyze_frame_async",
     new_callable=AsyncMock,
 )
-@patch(
-    "app.services.user_service.UserService.check_and_update_quota",
-    new_callable=AsyncMock,
-)
-def test_solve_vision_success(mock_quota, mock_analyze, mock_custom_key):
-    mock_quota.return_value = True
+def test_solve_vision_success(mock_analyze, mock_custom_key):
     from okey_core.types import Arrangement
 
     mock_analyze.return_value = Arrangement(melds=[], remainingTiles=[], totalScore=0)
