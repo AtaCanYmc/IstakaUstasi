@@ -377,6 +377,6 @@ Distributed under the **Apache 2.0 License**. See [LICENSE](LICENSE) for the ful
 
 <div align="center">
 
-Developed with care by [Ata Can Yalçın](https://github.com/AtaCanYmc) · Turkey 🇹🇷
+Developed with care by [Ata Can Yaymacı](https://github.com/AtaCanYmc) · Turkey 🇹🇷
 
 </div>
