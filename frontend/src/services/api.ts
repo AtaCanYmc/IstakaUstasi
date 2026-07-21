@@ -90,6 +90,27 @@ api.interceptors.request.use((config) => {
   return Promise.reject(error);
 });
 
+let onUnauthorizedCallback: (() => void) | null = null;
+
+export const registerUnauthorizedCallback = (cb: () => void) => {
+  onUnauthorizedCallback = cb;
+};
+
+// Response interceptor to handle global auth failures
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      if (onUnauthorizedCallback) {
+        onUnauthorizedCallback();
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const apiService = {
   // Auth API
   async login(email: string, password: string): Promise<AuthResponse> {
@@ -107,7 +128,10 @@ export const apiService = {
       const res = await api.post('/auth/sync');
       localStorage.setItem('cached_profile', JSON.stringify(res.data));
       return res.data;
-    } catch (error) {
+    } catch (error: any) {
+      if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+        throw error;
+      }
       const cached = localStorage.getItem('cached_profile');
       if (cached) {
         console.warn('Network error: Using cached user profile offline.');

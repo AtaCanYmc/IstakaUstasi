@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import apiService from '../services/api';
+import apiService, { registerUnauthorizedCallback } from '../services/api';
 import type { Tile, OkeyMeta, Arrangement, UserProfile, TileColor, RoboflowKeyResponse } from '../services/api';
 import { translations, type Language } from '../i18n/translations';
 
@@ -195,7 +195,11 @@ export const useStore = create<SolverState>((set, get) => ({
             set({ user: res.profile });
             localStorage.setItem('user', JSON.stringify(res.profile));
           })
-          .catch(() => {});
+          .catch((err) => {
+            if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+              get().logout();
+            }
+          });
       } catch {
         // Clear corrupt state
         localStorage.removeItem('token');
@@ -481,3 +485,8 @@ export const useStore = create<SolverState>((set, get) => ({
     } catch (err) {}
   }
 }));
+
+// Automatically log out user if any API call responds with 401 or 403
+registerUnauthorizedCallback(() => {
+  useStore.getState().logout();
+});
