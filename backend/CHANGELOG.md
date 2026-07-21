@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/AtaCanYmc/IstakaUstasi/compare/istaka-ustasi-backend-v0.5.0...istaka-ustasi-backend-v0.6.0) (2026-07-21)
+
+
+### Features
+
+* expand strategy options in ArrangeRequestCustom and update documentation ([34a7b59](https://github.com/AtaCanYmc/IstakaUstasi/commit/34a7b59c6f0f510561be3df9b4dfc87863fc23c4))
+
 ## [0.5.0](https://github.com/AtaCanYmc/IstakaUstasi/compare/istaka-ustasi-backend-v0.4.0...istaka-ustasi-backend-v0.5.0) (2026-07-21)
 
 
