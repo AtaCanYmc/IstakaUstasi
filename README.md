@@ -35,6 +35,33 @@ The application is architected as a **full-stack monorepo**:
 
 ---
 
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center">
+      <img src=".github/screenshots/solved-rack.jpeg" width="220" alt="Solved Rack — arranged melds highlighted on the board"/>
+      <br/><sub><b>Solved Rack</b></sub>
+    </td>
+    <td align="center">
+      <img src=".github/screenshots/solver-output.jpeg" width="220" alt="Solver Output Summary — detected meld groups with scores"/>
+      <br/><sub><b>Solver Output Summary</b></sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src=".github/screenshots/scan-board.jpeg" width="220" alt="Scan Board Image — upload a rack photo for automatic tile extraction"/>
+      <br/><sub><b>Vision Scan — Upload &amp; Extract</b></sub>
+    </td>
+    <td align="center">
+      <img src=".github/screenshots/tile-picker.jpeg" width="220" alt="Manual Tile Picker — click tiles to add them to the rack"/>
+      <br/><sub><b>Manual Tile Picker</b></sub>
+    </td>
+  </tr>
+</table>
+
+---
+
 ## Features
 
 ### 🧮 Multi-Strategy Solver Engine
