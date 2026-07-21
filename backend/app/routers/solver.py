@@ -16,12 +16,22 @@ router = APIRouter(prefix="/solver", tags=["Solver"])
 def arrange_hand(req: ArrangeRequestCustom, request: Request):
     """
     Solves and arranges a given list of Okey tiles into optimal melds.
-    Supports strategy selection: 'backtracking', 'greedy', 'ilp', 'hybrid'.
+    Supports strategy selection:
+    'backtracking', 'greedy', 'ilp', 'hybrid', 'beam', 'genetic', 'annealing', 'mcts'.
     """
     strategy = req.strategy or "backtracking"
     strategy = strategy.lower()
 
-    valid_strategies = ["backtracking", "greedy", "ilp", "hybrid"]
+    valid_strategies = [
+        "backtracking",
+        "greedy",
+        "ilp",
+        "hybrid",
+        "beam",
+        "genetic",
+        "annealing",
+        "mcts",
+    ]
     if strategy not in valid_strategies:
         raise HTTPException(
             status_code=400,
