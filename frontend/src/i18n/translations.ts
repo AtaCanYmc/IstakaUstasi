@@ -99,7 +99,15 @@ export const translations = {
     roboflowWorkflowTitle: "İş Akışımız (Workflow) Nasıl Çalışır?",
     roboflowWorkflowDesc: "Roboflow Workflow, yüklediğiniz ıstaka görselini önce YOLOv8 nesne algılama modelimizle tarar. Algılanan taş koordinatları, renkleri ve değerleri etiketlenerek JSON biçiminde FastAPI sunucumuza aktarılır. Sunucu bu koordinat dizilerini matematiksel Okey solver algoritmalarına besleyerek en yüksek skorlu dizilimleri hesaplar.",
     gotIt: "Anladım",
-    copy: "Kopyala"
+    copy: "Kopyala",
+    stratBacktracking: "Geri İzleme (Backtracking)",
+    stratGreedy: "Açgözlü (Greedy)",
+    stratIlp: "ILP (Matematiksel)",
+    stratHybrid: "Hibrit (Karma)",
+    stratBeam: "Işın Arama (Beam Search)",
+    stratGenetic: "Genetik Algoritma",
+    stratAnnealing: "Simüle Tavlama",
+    stratMcts: "MCTS (Ağaç Araması)"
   },
   en: {
     title: "Istaka Ustası",
@@ -199,7 +207,15 @@ export const translations = {
     roboflowWorkflowTitle: "How Does Our Workflow Work?",
     roboflowWorkflowDesc: "Roboflow Workflow first scans your uploaded rack image using our YOLOv8 object detection model. The coordinates, colors, and values of the detected tiles are annotated and sent as JSON to our FastAPI server. The server then feeds these coordinate arrays into mathematical Okey solver algorithms to calculate the highest-scoring arrangements.",
     gotIt: "Got It",
-    copy: "Copy"
+    copy: "Copy",
+    stratBacktracking: "Backtracking",
+    stratGreedy: "Greedy",
+    stratIlp: "ILP (Integer Linear Programming)",
+    stratHybrid: "Hybrid",
+    stratBeam: "Beam Search",
+    stratGenetic: "Genetic Algorithm",
+    stratAnnealing: "Simulated Annealing",
+    stratMcts: "MCTS (Monte Carlo Tree Search)"
   },
   fr: {
     title: "Istaka Ustası",
@@ -299,7 +315,15 @@ export const translations = {
     roboflowWorkflowTitle: "Comment fonctionne notre flux de travail (Workflow) ?",
     roboflowWorkflowDesc: "Roboflow Workflow scanne d'abord l'image de votre chevalet téléchargée en utilisant notre modèle de détection d'objets YOLOv8. Les coordonnées, couleurs et valeurs des tuiles détectées sont annotées et envoyées au format JSON à notre serveur FastAPI. Le serveur transmet ensuite ces tableaux de coordonnées aux algorithmes mathématiques du solveur d'Okey pour calculer les arrangements les plus performants.",
     gotIt: "Compris",
-    copy: "Copier"
+    copy: "Copier",
+    stratBacktracking: "Backtracking (Retour sur trace)",
+    stratGreedy: "Glouton (Greedy)",
+    stratIlp: "ILP (Programmation Linéaire)",
+    stratHybrid: "Hybride",
+    stratBeam: "Recherche de faisceau (Beam)",
+    stratGenetic: "Algorithme génétique",
+    stratAnnealing: "Recuit simulé",
+    stratMcts: "MCTS (Monte Carlo)"
   },
   de: {
     title: "Istaka Ustası",
@@ -399,6 +423,14 @@ export const translations = {
     roboflowWorkflowTitle: "Wie funktioniert unser Arbeitsablauf (Workflow)?",
     roboflowWorkflowDesc: "Roboflow Workflow scanne zuerst Ihr hochgeladenes Rack-Bild mit unserem YOLOv8-Objekterkennungsmodell. Die Koordinaten, Farben und Werte der erkannten Steine werden annotiert und als JSON an unseren FastAPI-Server gesendet. Der Server speist diese Koordinaten-Arrays dann in mathematische Okey-Löser-Algorithmen ein, um die Anordnungen mit der höchsten Punktzahl zu berechnen.",
     gotIt: "Verstanden",
-    copy: "Kopieren"
+    copy: "Kopieren",
+    stratBacktracking: "Backtracking (Rückverfolgung)",
+    stratGreedy: "Greedy (Gierig)",
+    stratIlp: "ILP (Ganzzahlige Optimierung)",
+    stratHybrid: "Hybrid",
+    stratBeam: "Strahlsuche (Beam Search)",
+    stratGenetic: "Genetischer Algorithmus",
+    stratAnnealing: "Simulierte Abkühlung",
+    stratMcts: "MCTS (Monte Carlo)"
   }
 };

@@ -16,21 +16,27 @@ export const RackControls: React.FC = () => {
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      {/* Strategy selector */}
-      <div className="flex bg-bg-secondary rounded-lg p-1 border border-card-border">
-        {(['backtracking', 'greedy', 'ilp', 'hybrid'] as const).map((strat) => (
-          <button
-            key={strat}
-            onClick={() => setStrategy(strat)}
-            className={`px-3 py-1 rounded-md text-xs font-semibold capitalize transition-all cursor-pointer ${
-              strategy === strat
-                ? 'bg-indigo-600 text-white shadow'
-                : 'text-text-secondary hover:text-text-primary'
-            }`}
-          >
-            {strat}
-          </button>
-        ))}
+      {/* Strategy selector dropdown */}
+      <div className="relative">
+        <select
+          value={strategy}
+          onChange={(e) => setStrategy(e.target.value as any)}
+          className="appearance-none bg-bg-secondary text-text-primary border border-card-border rounded-lg pl-3 pr-8 py-1.5 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-indigo-500 hover:border-text-secondary/35 cursor-pointer transition-all min-w-[140px]"
+        >
+          <option value="backtracking">{t('stratBacktracking')}</option>
+          <option value="greedy">{t('stratGreedy')}</option>
+          <option value="ilp">{t('stratIlp')}</option>
+          <option value="hybrid">{t('stratHybrid')}</option>
+          <option value="beam">{t('stratBeam')}</option>
+          <option value="genetic">{t('stratGenetic')}</option>
+          <option value="annealing">{t('stratAnnealing')}</option>
+          <option value="mcts">{t('stratMcts')}</option>
+        </select>
+        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-text-secondary">
+          <svg className="h-3.5 w-3.5 fill-none stroke-current" viewBox="0 0 24 24" strokeWidth="2.5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
       </div>
 
       {/* Allow one after toggle */}

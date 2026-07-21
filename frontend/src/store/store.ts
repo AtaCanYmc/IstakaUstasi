@@ -27,7 +27,7 @@ interface SolverState {
   // Rack Grid (2 rows of 20 slots = 40 slots)
   rack: (Tile | null)[];
   okeyMeta: OkeyMeta | null;
-  strategy: 'backtracking' | 'greedy' | 'ilp' | 'hybrid';
+  strategy: 'backtracking' | 'greedy' | 'ilp' | 'hybrid' | 'beam' | 'genetic' | 'annealing' | 'mcts';
   allowOneAfter: boolean;
   isSolving: boolean;
   solveError: string | null;
@@ -57,7 +57,7 @@ interface SolverState {
   removeTile: (index: number) => void;
   moveTile: (fromIndex: number, toIndex: number) => void;
   setOkeyMeta: (meta: OkeyMeta | null) => void;
-  setStrategy: (strategy: 'backtracking' | 'greedy' | 'ilp' | 'hybrid') => void;
+  setStrategy: (strategy: 'backtracking' | 'greedy' | 'ilp' | 'hybrid' | 'beam' | 'genetic' | 'annealing' | 'mcts') => void;
   setAllowOneAfter: (allow: boolean) => void;
 
   // Solver
