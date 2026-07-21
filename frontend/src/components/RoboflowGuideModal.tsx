@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, HelpCircle, Copy, Check, ArrowRight } from 'lucide-react';
+import { useStore } from '../store/store';
 
 interface RoboflowGuideModalProps {
   isOpen: boolean;
@@ -8,6 +9,7 @@ interface RoboflowGuideModalProps {
 
 export const RoboflowGuideModal: React.FC<RoboflowGuideModalProps> = ({ isOpen, onClose }) => {
   const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
+  const { t } = useStore();
 
   if (!isOpen) return null;
 
@@ -19,24 +21,24 @@ export const RoboflowGuideModal: React.FC<RoboflowGuideModalProps> = ({ isOpen, 
 
   const steps = [
     {
-      title: "1. Roboflow Hesabı Oluşturun",
-      desc: "Roboflow web sitesine giderek ücretsiz bir geliştirici hesabı açın veya giriş yapın.",
-      actionText: "roboflow.com adresine git",
+      title: t('roboflowStep1Title'),
+      desc: t('roboflowStep1Desc'),
+      actionText: t('roboflowStep1Action'),
       actionUrl: "https://roboflow.com",
     },
     {
-      title: "2. Private API Key'i Kopyalayın",
-      desc: "Profil -> Settings -> Workspaces adımları altındaki API Keys bölümünden gizli anahtarınızı alın.",
+      title: t('roboflowStep2Title'),
+      desc: t('roboflowStep2Desc'),
       example: "rf_xxxxxxxxxxxxxxxxxxxxxxxx",
     },
     {
-      title: "3. Workspace Adını Kopyalayın",
-      desc: "Roboflow paneline girdiğinizde tarayıcınızın URL kısmında veya Workspace ayarlarında yazar.",
+      title: t('roboflowStep3Title'),
+      desc: t('roboflowStep3Desc'),
       example: "ata-dc7ry",
     },
     {
-      title: "4. Workflow ID'yi Oluşturun",
-      desc: "Çalışma alanınızın 'Workflows' menüsünden YOLOv8 taş algılama modelini bağladığınız iş akışını oluşturup ID'sini kopyalayın.",
+      title: t('roboflowStep4Title'),
+      desc: t('roboflowStep4Desc'),
       example: "okey-and-rummikub-vrummikub-p8akb-vr0ef-3-yolov8n-t1-logic",
     },
   ];
@@ -52,10 +54,10 @@ export const RoboflowGuideModal: React.FC<RoboflowGuideModalProps> = ({ isOpen, 
             <HelpCircle className="w-5 h-5 text-indigo-500" />
             <div>
               <h3 className="text-base font-bold text-text-primary">
-                Roboflow Kurulum Rehberi
+                {t('roboflowGuideTitle')}
               </h3>
               <p className="text-xs text-text-secondary mt-0.5">
-                Kendi API anahtarınız ve görsel iş akışınız ile limitsiz tarama yapın.
+                {t('roboflowGuideDesc')}
               </p>
             </div>
           </div>
@@ -88,7 +90,7 @@ export const RoboflowGuideModal: React.FC<RoboflowGuideModalProps> = ({ isOpen, 
                     <button
                       onClick={() => copyToClipboard(step.example, idx)}
                       className="p-1 rounded hover:bg-card-bg text-text-tertiary hover:text-text-primary transition-all cursor-pointer"
-                      title="Kopyala"
+                      title={t('copy')}
                     >
                       {copiedIndex === idx ? (
                         <Check className="w-3.5 h-3.5 text-emerald-500" />
@@ -119,10 +121,10 @@ export const RoboflowGuideModal: React.FC<RoboflowGuideModalProps> = ({ isOpen, 
         <div className="p-4 rounded-xl bg-indigo-950/20 dark:bg-indigo-950/40 border border-indigo-500/20 text-xs text-indigo-300 space-y-2 leading-relaxed">
           <h5 className="font-bold flex items-center gap-1.5 text-indigo-400">
             <SparklesIcon />
-            İş Akışımız (Workflow) Nasıl Çalışır?
+            {t('roboflowWorkflowTitle')}
           </h5>
           <p className="text-[11px]">
-            Roboflow Workflow, yüklediğiniz ıstaka görselini önce <strong>YOLOv8</strong> nesne algılama modelimizle tarar. Algılanan taş koordinatları, renkleri ve değerleri etiketlenerek JSON biçiminde FastAPI sunucumuza aktarılır. Sunucu bu koordinat dizilerini matematiksel Okey solver algoritmalarına besleyerek en yüksek skorlu dizilimleri hesaplar.
+            {t('roboflowWorkflowDesc')}
           </p>
         </div>
 
@@ -132,7 +134,7 @@ export const RoboflowGuideModal: React.FC<RoboflowGuideModalProps> = ({ isOpen, 
             onClick={onClose}
             className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer"
           >
-            Anladım
+            {t('gotIt')}
           </button>
         </div>
       </div>
