@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.5.0](https://github.com/AtaCanYmc/IstakaUstasi/compare/istaka-ustasi-backend-v0.4.0...istaka-ustasi-backend-v0.5.0) (2026-07-21)
+
+
+### Features
+
+* add user custom key check and update vision processing tests ([398080d](https://github.com/AtaCanYmc/IstakaUstasi/commit/398080d75694262af2c17c5fd0c742a75b88e83e))
+* encrypt user Roboflow API keys before storing in database using Fernet AES-128/256 ([a0079c0](https://github.com/AtaCanYmc/IstakaUstasi/commit/a0079c0e4950068ac20edd6f2e7cd5b3f444023c))
+* enforce user custom Roboflow API keys for all vision processing operations ([4ff16d6](https://github.com/AtaCanYmc/IstakaUstasi/commit/4ff16d6b6a0d5fa6cd26077ff243c64c1711e6f2))
+* implement backend dynamic localization for error messages based on Accept-Language header ([8a11727](https://github.com/AtaCanYmc/IstakaUstasi/commit/8a11727db579b67be4ea32f93a3eec9823da8751))
+* implement user-friendly error parsing for Roboflow API responses ([79e2b85](https://github.com/AtaCanYmc/IstakaUstasi/commit/79e2b85a5106ed93c54e13b67fc9083935ccaab4))
+* update README with enhanced project overview, features, and architecture details ([1601176](https://github.com/AtaCanYmc/IstakaUstasi/commit/1601176a5b17760141e376ad2d41ffd9780e645a))
+* user profile settings section to allow updating username ([ddd5a1f](https://github.com/AtaCanYmc/IstakaUstasi/commit/ddd5a1f68202bd9f101473edfd845147565e9f35))
+* user-defined custom Roboflow API keys for unlimited vision scanning ([2d97422](https://github.com/AtaCanYmc/IstakaUstasi/commit/2d9742250851ceb3035e290cac1c9936a29db807))
+
+
+### Bug Fixes
+
+* allow github pages origin in CORS configuration ([54f67c4](https://github.com/AtaCanYmc/IstakaUstasi/commit/54f67c4c25384d8b581cf58f06eff044c155940a))
+* pass allow_one_after and strategy to vision solve endpoint and background tasks ([fc25e62](https://github.com/AtaCanYmc/IstakaUstasi/commit/fc25e62b65cbedd59acc5bc902607b8057ce4194))
+
 ## [0.4.0](https://github.com/AtaCanYmc/IstakaUstasi/compare/istaka-ustasi-backend-v0.3.0...istaka-ustasi-backend-v0.4.0) (2026-07-19)
 
 
