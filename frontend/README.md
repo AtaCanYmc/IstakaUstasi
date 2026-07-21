@@ -1,56 +1,203 @@
-# 🎴 Istaka Ustası Frontend (React + TypeScript + Vite)
+# Istaka Ustası — Frontend
 
-This is the user interface client for the **Istaka Ustası (Okey Solver)** application. Built using Vite, React, TypeScript, Tailwind CSS v4, Zustand, and `@hello-pangea/dnd`.
+> React 19 + TypeScript + Vite SPA for the Okey Solver & Computer Vision application.
 
-## 🚀 Technical Highlights
-
-### 1. Smart Rack Layout Algorithm
-When the backend solver returns the optimal melds, the frontend Zustand store calculates a visually pleasant layout:
-* Divides the rack into **2 rows of 20 slots** (40 slots in total).
-* Places melds sequentially while leaving **empty slots** between different groups.
-* Wraps meld groups automatically if they exceed row boundaries.
-* Collects remaining/unarranged tiles at the end of the second row, separated by gaps.
-
-### 2. Interactive Drag & Drop
-* Integrated `@hello-pangea/dnd` to map rack slots.
-* Users can manually swap and rearrange tiles on the rack by dragging them into empty slots or other tile locations.
-
-### 3. Tailwind CSS v4
-* Leverages Tailwind CSS v4 for a utility-first styling architecture.
-* Features responsive glassmorphic interfaces, high-fidelity Okey tile assets with 3D gradients, and dark mode base styling.
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=white)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-6-646cff?logo=vite&logoColor=white)](https://vitejs.dev/)
 
 ---
 
-## 📂 Codebase Overview
+## Contents
 
-* **`src/components/`**:
-  * **`Board.tsx`**: Renders the Okey rack grid and manages Drag & Drop handlers.
-  * **`Tile.tsx`**: High-fidelity Okey tile renderer mapping numbers, colors, indicators, and deletion handlers.
-  * **`TilePool.tsx`**: A panel to select tiles to place on the rack and set the Okey Indicator tile (okeyMeta).
-  * **`VisionUpload.tsx`**: Drag & drop zone to upload images of a real Okey board, showing quota and loading states.
-  * **`AuthModal.tsx`**: Authenticates users to access the vision endpoints.
-* **`src/services/api.ts`**: Axios client with API endpoints mapping and JWT header injection interceptors.
-* **`src/store/store.ts`**: Zustand state container managing rack cells, solver metadata, and auth workflows.
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [State Management](#state-management)
+- [Key Components](#key-components)
+- [Vision Upload Flow](#vision-upload-flow)
+- [Rack Layout Algorithm](#rack-layout-algorithm)
+- [Internationalization](#internationalization)
+- [Development Commands](#development-commands)
+- [Testing](#testing)
 
 ---
 
-## ⚙️ Development Commands
+## Tech Stack
 
-In the frontend directory:
+| Package | Role |
+|---------|------|
+| **React 19** | UI rendering |
+| **TypeScript 5** | Static typing |
+| **Vite 6** | Dev server + production bundler |
+| **Zustand** | Granular global state store |
+| **Tailwind CSS v4** | Utility-first styling |
+| **@hello-pangea/dnd** | Accessible drag-and-drop for the rack board |
+| **Axios** | HTTP client with JWT interceptor + global 401 handler |
+| **Vitest + jsdom** | Unit and component tests |
+| **Lucide React** | Icon set |
 
-* **Install dependencies**:
-  ```bash
-  npm install
-  ```
-* **Start local dev server**:
-  ```bash
-  npm run dev
-  ```
-* **Build production package**:
-  ```bash
-  npm run build
-  ```
-* **Preview build**:
-  ```bash
-  npm run preview
-  ```
+---
+
+## Project Structure
+
+```
+src/
+├── components/
+│   ├── AuthModal.tsx          # Login / register modal
+│   ├── BackendWakingToast.tsx # Cold-start notification toast
+│   ├── Board.tsx              # 40-slot drag-and-drop rack grid
+│   ├── Header.tsx             # Top navigation bar
+│   ├── RackControls.tsx       # Strategy selector, toggles, solve/reset buttons
+│   ├── RoboflowGuideModal.tsx # Step-by-step Roboflow setup guide
+│   ├── SettingsModal.tsx      # User profile + Roboflow key management
+│   ├── SolverResults.tsx      # Meld groups + remaining tiles display
+│   ├── Tile.tsx               # Single tile renderer (color, value, indicator)
+│   ├── TilePool.tsx           # Manual tile selector + Okey indicator picker
+│   ├── VisionUpload.tsx       # Drag-and-drop image upload + job polling
+│   └── WorkspaceBanner.tsx    # Contextual guidance banner
+├── i18n/
+│   └── translations.ts        # tr / en / fr / de locale strings
+├── pages/
+│   └── Dashboard.tsx          # Main layout (Board + TilePool + VisionUpload + Results)
+├── services/
+│   └── api.ts                 # Axios instance, interceptors, typed API methods
+├── store/
+│   └── store.ts               # Zustand store (auth, rack, solver, vision)
+└── App.tsx                    # Root: backend check + BackendWakingToast
+```
+
+---
+
+## State Management
+
+All application state lives in a single **Zustand** store (`src/store/store.ts`). The store is divided into four logical domains:
+
+| Domain | State | Actions |
+|--------|-------|---------|
+| **Auth** | `user`, `token`, `isLoggingIn`, `authError` | `login`, `signup`, `logout`, `initializeAuth` |
+| **Roboflow** | `roboflowKeyConfig` | `fetchRoboflowKeyConfig`, `saveRoboflowKeyConfig`, `deleteRoboflowKeyConfig` |
+| **Rack / Solver** | `rack[40]`, `strategy`, `allowOneAfter`, `isSolving`, `solverResult`, `solveError` | `solve`, `addTile`, `removeTile`, `moveTile`, `clearRack`, `applyArrangement` |
+| **Vision** | `isProcessingVision`, `visionError`, `isBackendWaking` | `uploadImageExtract`, `uploadImageSolve`, `initBackendCheck` |
+
+### Global 401 Handler
+
+`api.ts` registers a response interceptor that catches any `401` or `403` response and automatically calls `useStore.getState().logout()`, clearing tokens and redirecting the user to the sign-in state without requiring per-endpoint error handling.
+
+---
+
+## Key Components
+
+### `Board.tsx`
+Renders a **2 × 20 slot grid** (40 slots total) backed by `@hello-pangea/dnd`. Each slot is a `Droppable`; each tile is a `Draggable`. Dropping a tile onto a filled slot **swaps** the two tiles rather than displacing them.
+
+### `RackControls.tsx`
+Houses the solver **strategy dropdown** (8 strategies, localized labels), the `allowOneAfter` checkbox, a clear button, and the primary **Solve** action button with spinner state.
+
+### `VisionUpload.tsx`
+Manages the full vision upload lifecycle:
+- Accepts files via **drag-and-drop** zone *or* `<input type="file">` click
+- Stores the selected `File` in local state (works for both interaction modes)
+- On action, calls `uploadImageExtract` or `uploadImageSolve` from the store
+- Shows real-time processing state, error messages, and image preview
+
+### `SolverResults.tsx`
+Displays the arrangement returned by the solver:
+- Header summary: meld count + total score
+- Grid of `MeldCard` sub-components (color-coded badges: SERI / PER / CIFT)
+- Unarranged remaining tiles section
+
+### `SettingsModal.tsx`
+Combines user profile editing (username) with Roboflow credential management. Pre-populates `workspace`, `workflow_id`, and `api_url` with sensible defaults so users only need to paste their API key.
+
+---
+
+## Vision Upload Flow
+
+```
+User drops image
+       │
+       ├─► selectedFile state updated
+       │
+       ▼
+"Extract to Board" or "Extract & Solve" button
+       │
+       ├─► apiService.extractVision(file) → POST /vision/extract
+       │          └─► 202 { job_id }
+       │
+       ├─► Poll GET /vision/jobs/{job_id} every 1000 ms
+       │          ├─► status === "processing" → continue
+       │          ├─► status === "completed"  → populate rack / apply arrangement
+       │          └─► status === "failed"     → show visionError
+       │
+       └─► isProcessingVision = false
+```
+
+Polling has a **60-second timeout**. If the job does not complete in time, a timeout error is shown.
+
+---
+
+## Rack Layout Algorithm
+
+When `applyArrangement` is called with solver output, the store computes a visually organized rack layout:
+
+1. Iterate over each meld group sequentially
+2. Place meld tiles into the next available rack slots
+3. Insert **one empty slot** as a visual separator after each meld
+4. After all melds, place **remaining (unarranged) tiles** at the end of the rack
+5. Wrap across the two rows automatically when the current row is full
+
+This produces a rack that visually mirrors how a skilled player would organize their hand.
+
+---
+
+## Internationalization
+
+All UI strings are defined in `src/i18n/translations.ts` and accessed via the `t(key)` helper from the Zustand store. The `t` function supports **interpolation**:
+
+```typescript
+t('quotaLeft', { count: 3 })  // → "Quota: 3 extractions left"
+```
+
+Supported locales: `tr` (Turkish) · `en` (English) · `fr` (French) · `de` (German)
+
+Language preference is persisted to `localStorage` and restored on page load.
+
+---
+
+## Development Commands
+
+All commands run from the `frontend/` directory.
+
+```bash
+# Install dependencies
+npm install
+
+# Start Vite dev server (http://localhost:5173)
+npm run dev
+
+# Type-check without emitting
+npm run typecheck
+
+# Production build → dist/
+npm run build
+
+# Preview production build locally
+npm run preview
+```
+
+---
+
+## Testing
+
+```bash
+# Run all tests (Vitest + jsdom)
+npm run test
+
+# Watch mode
+npm run test -- --watch
+
+# Coverage report
+npm run test -- --coverage
+```
+
+Test files are co-located with components (`*.test.tsx`) and use the `@testing-library/react` conventions.
