@@ -1,6 +1,6 @@
 okey-solver-py[vision,server]==0.6.0
 supabase>=2.0.0
-structlog>=22.3.0
+structlog>=26.1.0
 pytest>=7.0.0
 pytest-asyncio>=0.21.0
 httpx>=0.24.0
